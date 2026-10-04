@@ -9,10 +9,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const URL_INTENDENTE = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
 const URL_CONCEJALES = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
 
-// Datos base oficiales (para que nunca aparezca en 0 si el TREP satura)
-let ultimaDataValida = {
+// Base actualizada con la última captura oficial
+let estadoActual = {
   ok: true,
-  servidorHora: "04-10-2026 18:40:02",
+  servidorHora: "En Vivo",
   mesas: {
     total: 71,
     procesadas: 69,
@@ -20,105 +20,94 @@ let ultimaDataValida = {
     totalVotos: 11512
   },
   intendente: {
-    lista9: {
-      nombre: "CONCEPCION MARTINEZ",
-      votos: 6407,
-      porcentaje: "58.56%"
-    },
-    lista1: {
-      nombre: "HERNAN RIVAS",
-      votos: 4152,
-      porcentaje: "37.95%"
-    }
+    lista9: { nombre: "CONCEPCION MARTINEZ", votos: 6407, porcentaje: "58.56%" },
+    lista1: { nombre: "HERNAN RIVAS", votos: 4152, porcentaje: "37.95%" }
   },
   concejal: {
     armandoKegler: {
       nombre: "ARMANDO KEGLER SAUCEDO",
       orden: 4,
-      votosPreferenciales: 264,
+      votosPreferenciales: 328, // Último dato registrado
       totalLista9Concejales: 3840
     }
   }
 };
 
-async function fetchTREP(url) {
-  // Cabeceras idénticas a las del navegador para evitar el error 403
+// Función con reintentos para no caer en el 503 o 403 del TSJE
+async function consultarTSJEConReintento(url, intentos = 3) {
   const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Accept-Language': 'es-PY,es;q=0.9,en;q=0.8',
     'Referer': 'https://resultados.tsje.gov.py/publicacion/divulgacion.html',
-    'Origin': 'https://resultados.tsje.gov.py',
-    'X-Requested-With': 'XMLHttpRequest',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin'
+    'X-Requested-With': 'XMLHttpRequest'
   };
 
-  const response = await fetch(`${url}&_=${Date.now()}`, { headers });
-  if (!response.ok) {
-    throw new Error(`TSJE Status ${response.status}`);
+  for (let i = 0; i < intentos; i++) {
+    try {
+      const res = await fetch(`${url}&_=${Date.now()}`, { headers });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch (e) {
+      // Si falla, espera medio segundo y reintenta
+      await new Promise(r => setTimeout(r, 600));
+    }
   }
-  return await response.json();
+  return null;
 }
 
 app.get('/api/resultados', async (req, res) => {
-  try {
-    const [dataIntendente, dataConcejal] = await Promise.all([
-      fetchTREP(URL_INTENDENTE),
-      fetchTREP(URL_CONCEJALES)
-    ]);
+  // Consultas en paralelo pero independientes
+  const [dataIntendente, dataConcejal] = await Promise.all([
+    consultarTSJEConReintento(URL_INTENDENTE),
+    consultarTSJEConReintento(URL_CONCEJALES)
+  ]);
 
-    // Candidatos Intendente
-    const l1Int = dataIntendente.candidatos?.find(c => c.numLista === "1" || c.numLista == 1) || {};
-    const l9Int = dataIntendente.candidatos?.find(c => c.numLista === "9" || c.numLista == 9) || {};
-    const totalInt = dataIntendente.totales?.totalVotos || 1;
-
-    // Concejales
-    const l9Conc = dataConcejal.candidatos?.find(c => c.numLista === "9" || c.numLista == 9) || {};
-    let kegler = null;
-    if (Array.isArray(l9Conc.candidatosPref)) {
-      kegler = l9Conc.candidatosPref.find(p => 
+  // Si respondió Concejales, actualizamos Armando Kegler
+  if (dataConcejal && dataConcejal.candidatos) {
+    const l9Conc = dataConcejal.candidatos.find(c => c.numLista === "9" || c.numLista == 9);
+    if (l9Conc && Array.isArray(l9Conc.candidatosPref)) {
+      const kegler = l9Conc.candidatosPref.find(p => 
         (p.nomCandidato && p.nomCandidato.toUpperCase().includes("KEGLER")) || p.orden === 4 || p.orden === "4"
       );
-    }
-
-    ultimaDataValida = {
-      ok: true,
-      servidorHora: dataIntendente.horaFormated || ultimaDataValida.servidorHora,
-      mesas: {
-        total: dataIntendente.totales?.totalMesas || 71,
-        procesadas: dataIntendente.totales?.mesasPublicadas || ultimaDataValida.mesas.procesadas,
-        porcentaje: ((dataIntendente.totales?.mesasPublicadas / (dataIntendente.totales?.totalMesas || 71)) * 100).toFixed(2) + "%",
-        totalVotos: dataIntendente.totales?.totalVotos || ultimaDataValida.mesas.totalVotos
-      },
-      intendente: {
-        lista9: {
-          nombre: l9Int.nomCandidato || "CONCEPCION MARTINEZ",
-          votos: l9Int.votos || ultimaDataValida.intendente.lista9.votos,
-          porcentaje: (( (l9Int.votos || ultimaDataValida.intendente.lista9.votos) / totalInt) * 100).toFixed(2) + "%"
-        },
-        lista1: {
-          nombre: l1Int.nomCandidato || "HERNAN RIVAS",
-          votos: l1Int.votos || ultimaDataValida.intendente.lista1.votos,
-          porcentaje: (( (l1Int.votos || ultimaDataValida.intendente.lista1.votos) / totalInt) * 100).toFixed(2) + "%"
-        }
-      },
-      concejal: {
-        armandoKegler: {
-          nombre: "ARMANDO KEGLER SAUCEDO",
-          orden: 4,
-          votosPreferenciales: kegler?.votos || kegler?.pref || ultimaDataValida.concejal.armandoKegler.votosPreferenciales,
-          totalLista9Concejales: l9Conc.votos || ultimaDataValida.concejal.armandoKegler.totalLista9Concejales
-        }
+      if (kegler && (kegler.votos || kegler.pref)) {
+        estadoActual.concejal.armandoKegler.votosPreferenciales = Number(kegler.votos || kegler.pref);
       }
-    };
-
-    res.json(ultimaDataValida);
-  } catch (error) {
-    console.warn("TSJE ocupado o bloqueado, entregando último dato:", error.message);
-    res.json(ultimaDataValida);
+      if (l9Conc.votos) {
+        estadoActual.concejal.armandoKegler.totalLista9Concejales = Number(l9Conc.votos);
+      }
+    }
+    if (dataConcejal.horaFormated) {
+      estadoActual.servidorHora = dataConcejal.horaFormated;
+    }
   }
+
+  // Si respondió Intendente, actualizamos
+  if (dataIntendente && dataIntendente.candidatos) {
+    const l1 = dataIntendente.candidatos.find(c => c.numLista === "1" || c.numLista == 1);
+    const l9 = dataIntendente.candidatos.find(c => c.numLista === "9" || c.numLista == 9);
+    const tot = dataIntendente.totales?.totalVotos || 1;
+
+    if (l1 && l1.votos) {
+      estadoActual.intendente.lista1.votos = Number(l1.votos);
+      estadoActual.intendente.lista1.porcentaje = ((l1.votos / tot) * 100).toFixed(2) + "%";
+    }
+    if (l9 && l9.votos) {
+      estadoActual.intendente.lista9.votos = Number(l9.votos);
+      estadoActual.intendente.lista9.porcentaje = ((l9.votos / tot) * 100).toFixed(2) + "%";
+    }
+    if (dataIntendente.totales) {
+      estadoActual.mesas.procesadas = dataIntendente.totales.mesasPublicadas || estadoActual.mesas.procesadas;
+      estadoActual.mesas.total = dataIntendente.totales.totalMesas || estadoActual.mesas.total;
+      estadoActual.mesas.porcentaje = ((estadoActual.mesas.procesadas / estadoActual.mesas.total) * 100).toFixed(2) + "%";
+      estadoActual.mesas.totalVotos = dataIntendente.totales.totalVotos || estadoActual.mesas.totalVotos;
+    }
+    if (dataIntendente.horaFormated) {
+      estadoActual.servidorHora = dataIntendente.horaFormated;
+    }
+  }
+
+  res.json(estadoActual);
 });
 
 const PORT = process.env.PORT || 3000;

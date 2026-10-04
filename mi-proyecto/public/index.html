@@ -3,7 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TREP - Tomás Romero Pereira</title>
+  <title>TREP en Vivo - Armando Kegler (Opción 4)</title>
+
+  <!-- METADATOS PARA WHATSAPP / REDES SOCIALES -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Resultados TREP en Vivo - Armando Kegler (Opción 4)">
+  <meta property="og:description" content="Conteo en tiempo real: Tomás Romero Pereira - Elecciones Municipales">
+  <meta property="og:image" content="https://armando-kegler.onrender.com/logo.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://armando-kegler.onrender.com">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://armando-kegler.onrender.com/logo.jpg">
+
   <style>
     :root {
       --verde-oscuro: #005a28;
@@ -20,17 +32,15 @@
     body { background-color: #f0f4f1; color: var(--texto-oscuro); padding: 8px; }
     .container { max-width: 420px; margin: 0 auto; }
 
-    /* Encabezado Compacto */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
       color: var(--blanco); padding: 8px 12px; border-radius: 12px;
       text-align: center; margin-bottom: 6px; position: relative;
     }
     .header::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--naranja); }
-    .header h1 { font-size: 1rem; font-weight: 800; text-transform: uppercase; }
-    .header p { font-size: 0.72rem; opacity: 0.9; }
+    .header h1 { font-size: 0.98rem; font-weight: 800; text-transform: uppercase; }
+    .header p { font-size: 0.7rem; opacity: 0.9; }
 
-    /* Barra del Reloj y Botón de Refresh */
     .timer-container {
       display: flex; justify-content: space-between; align-items: center;
       background: var(--blanco); padding: 5px 10px; border-radius: 50px;
@@ -38,17 +48,14 @@
     }
     .timer-badge { background: var(--naranja); color: var(--blanco); font-weight: 700; padding: 2px 7px; border-radius: 12px; }
     
-    /* Botón Actualizar */
     .btn-refresh {
       background: var(--verde-principal); color: var(--blanco);
       border: none; padding: 4px 10px; border-radius: 15px;
       font-size: 0.72rem; font-weight: 700; cursor: pointer;
       display: inline-flex; align-items: center; gap: 4px;
-      transition: background 0.2s, transform 0.1s;
     }
     .btn-refresh:active { transform: scale(0.95); background: var(--verde-oscuro); }
 
-    /* Tarjeta Compacta Armando Kegler */
     .card-kegler {
       background: var(--blanco); border-radius: 12px; padding: 8px 10px;
       margin-bottom: 8px; box-shadow: 0 3px 8px rgba(0,0,0,0.05);
@@ -80,10 +87,9 @@
       padding: 6px; margin: 4px 0;
     }
     .votos-numero { font-size: 2.2rem; font-weight: 900; color: var(--verde-principal); line-height: 1; }
-    .votos-etiqueta { font-size: 0.65rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; margin-top: 2px; }
-    .subtotal-txt { font-size: 0.7rem; color: var(--texto-gris); }
+    .votos-etiqueta { font-size: 0.65rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; }
+    .subtotal-txt { font-size: 0.7rem; color: var(--texto-gris); margin-top: 2px; }
 
-    /* Tarjeta Intendente Compacta */
     .card-secundaria {
       background: var(--blanco); border-radius: 12px; padding: 8px 10px;
       margin-bottom: 8px; border: 1px solid #e1e7e3;
@@ -112,7 +118,6 @@
     .int-res strong { font-size: 0.95rem; display: block; line-height: 1.1; }
     .int-res span { font-size: 0.68rem; font-weight: 700; color: var(--texto-gris); }
 
-    /* Mesas en una sola fila compacta */
     .mesas-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
       background: var(--blanco); padding: 6px; border-radius: 10px;
@@ -125,13 +130,11 @@
 <body>
 
   <div class="container">
-    <!-- Cabecera -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de Tiempo + Botón de Actualizar -->
     <div class="timer-container">
       <span id="hora-trep" style="color: var(--texto-gris); font-size: 0.7rem;">Cargando...</span>
       <div style="display: flex; align-items: center; gap: 6px;">
@@ -142,11 +145,12 @@
       </div>
     </div>
 
-    <!-- TARJETA ARMANDO KEGLER (Rediseño compacto horizontal) -->
+    <!-- ARMANDO KEGLER -->
     <div class="card-kegler">
       <div class="kegler-top-row">
         <div class="foto-kegler-container">
-          <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff'">
+          <!-- Carga logo.jpg, kegler.jpg o el círculo verde con letras -->
+          <img src="logo.jpg" alt="Armando Kegler" onerror="this.src='kegler.jpg'; this.onerror=function(){this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';};">
         </div>
         <div class="kegler-info">
           <div class="badges-top">
@@ -159,7 +163,7 @@
       </div>
 
       <div class="votos-display">
-        <div class="votos-numero" id="kegler-votos">---</div>
+        <div class="votos-numero" id="kegler-votos">328</div>
         <div class="votos-etiqueta">Votos Preferenciales Obtenidos</div>
       </div>
       <div class="subtotal-txt">
@@ -167,7 +171,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN INTENDENTE -->
+    <!-- INTENDENTE -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
@@ -203,7 +207,7 @@
       </div>
     </div>
 
-    <!-- ESTADO DE MESAS -->
+    <!-- MESAS -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
@@ -255,7 +259,6 @@
       }
     }
 
-    // Botón manual de Refresh
     async function forzarActualizacion() {
       const btn = document.getElementById('btn-refresh');
       btn.innerText = "⏳...";
@@ -267,7 +270,6 @@
       btn.disabled = false;
     }
 
-    // Reloj regresivo
     setInterval(() => {
       timer--;
       document.getElementById('countdown').innerText = timer + "s";
