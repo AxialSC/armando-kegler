@@ -10,7 +10,6 @@
       --verde-principal: #00873d;
       --verde-claro: #e8f5e9;
       --naranja: #f36c21;
-      --naranja-claro: #fff3e0;
       --blanco: #ffffff;
       --texto-oscuro: #1b262c;
       --texto-gris: #55636b;
@@ -19,147 +18,101 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
     body { background-color: #f0f4f1; color: var(--texto-oscuro); padding: 12px; }
-    .container { max-width: 480px; margin: 0 auto; } /* Ancho pensado 100% para celular */
+    .container { max-width: 480px; margin: 0 auto; }
 
     /* Encabezado */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
       color: var(--blanco);
-      padding: 18px 14px;
+      padding: 16px 14px;
       border-radius: 16px;
       text-align: center;
       box-shadow: 0 4px 15px rgba(0, 90, 40, 0.2);
       margin-bottom: 12px;
       position: relative;
-      overflow: hidden;
     }
     .header::after {
-      content: "";
-      position: absolute;
-      bottom: 0; left: 0; right: 0; height: 5px;
+      content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
       background: var(--naranja);
     }
-    .header h1 { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-    .header p { font-size: 0.8rem; opacity: 0.9; margin-top: 3px; }
+    .header h1 { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; }
+    .header p { font-size: 0.8rem; opacity: 0.9; margin-top: 2px; }
 
-    /* Barra del Reloj Regresivo */
+    /* Barra del Reloj */
     .timer-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--blanco);
-      padding: 8px 14px;
-      border-radius: 50px;
-      margin-bottom: 14px;
-      border: 1px solid #dcdcdc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.04);
-      font-size: 0.8rem;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--blanco); padding: 8px 14px; border-radius: 50px;
+      margin-bottom: 14px; border: 1px solid #dcdcdc; font-size: 0.8rem;
     }
-    .timer-badge {
-      background: var(--naranja);
-      color: var(--blanco);
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 20px;
-    }
+    .timer-badge { background: var(--naranja); color: var(--blanco); font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 
     /* Tarjeta Principal Armando Kegler */
     .card-kegler {
-      background: var(--blanco);
-      border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 14px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.06);
-      border: 2px solid var(--verde-principal);
-      text-align: center;
+      background: var(--blanco); border-radius: 16px; padding: 16px;
+      margin-bottom: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+      border: 2px solid var(--verde-principal); text-align: center;
     }
-    .badges-top {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
+    
+    /* Foto Armando Kegler */
+    .foto-kegler-container {
+      width: 100px; height: 100px; margin: 0 auto 10px auto;
+      border-radius: 50%; overflow: hidden;
+      border: 3px solid var(--naranja);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      background: #eee;
     }
-    .pill {
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 4px 12px;
-      border-radius: 8px;
-      text-transform: uppercase;
-    }
+    .foto-kegler-container img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badges-top { display: flex; justify-content: center; gap: 8px; margin-bottom: 6px; }
+    .pill { font-size: 0.75rem; font-weight: 800; padding: 3px 10px; border-radius: 8px; text-transform: uppercase; }
     .pill-lista { background: var(--verde-claro); color: var(--verde-oscuro); border: 1px solid var(--verde-principal); }
     .pill-opcion { background: var(--naranja); color: var(--blanco); }
 
-    .candidato-nombre {
-      font-size: 1.25rem;
-      font-weight: 900;
-      color: var(--verde-oscuro);
-      line-height: 1.2;
-      margin: 4px 0;
-    }
+    .candidato-nombre { font-size: 1.25rem; font-weight: 900; color: var(--verde-oscuro); margin: 2px 0; }
     .cargo-sub { font-size: 0.8rem; font-weight: 700; color: var(--naranja); letter-spacing: 1px; }
 
     .votos-display {
       background: linear-gradient(to bottom, #f9fbf9, var(--verde-claro));
-      border: 1px dashed var(--verde-principal);
-      border-radius: 14px;
-      padding: 14px 10px;
-      margin: 12px 0;
+      border: 1px dashed var(--verde-principal); border-radius: 14px;
+      padding: 12px 10px; margin: 10px 0;
     }
-    .votos-numero {
-      font-size: 3rem;
-      font-weight: 900;
-      color: var(--verde-principal);
-      line-height: 1;
-    }
+    .votos-numero { font-size: 2.8rem; font-weight: 900; color: var(--verde-principal); line-height: 1; }
     .votos-etiqueta { font-size: 0.75rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; margin-top: 4px; }
 
     /* Tarjeta Intendente */
     .card-secundaria {
-      background: var(--blanco);
-      border-radius: 16px;
-      padding: 14px;
-      margin-bottom: 14px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-      border: 1px solid #e1e7e3;
+      background: var(--blanco); border-radius: 16px; padding: 14px;
+      margin-bottom: 14px; border: 1px solid #e1e7e3;
     }
     .seccion-titulo {
-      font-size: 0.8rem;
-      font-weight: 800;
-      color: var(--texto-gris);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
+      font-size: 0.8rem; font-weight: 800; color: var(--texto-gris);
+      text-transform: uppercase; margin-bottom: 10px; display: flex; justify-content: space-between;
     }
 
     .fila-intendente {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px; border-radius: 10px; margin-bottom: 8px; gap: 10px;
     }
     .int-pen { background: #fffcf5; border-left: 5px solid var(--naranja); }
     .int-anr { background: #fff8f8; border-left: 5px solid var(--rojo-anr); }
 
-    .int-info h4 { font-size: 0.85rem; font-weight: 800; }
-    .int-info p { font-size: 0.75rem; color: var(--texto-gris); }
-    .int-res { text-align: right; }
+    .int-candidato-flex { display: flex; align-items: center; gap: 10px; }
+    .foto-mini {
+      width: 44px; height: 44px; border-radius: 50%;
+      object-fit: cover; border: 2px solid #ddd; background: #fff;
+    }
+
+    .int-info h4 { font-size: 0.82rem; font-weight: 800; }
+    .int-info p { font-size: 0.72rem; color: var(--texto-gris); }
+    .int-res { text-align: right; min-width: 60px; }
     .int-res strong { font-size: 1.1rem; display: block; }
     .int-res span { font-size: 0.75rem; font-weight: 700; color: var(--texto-gris); }
 
     /* Estado de Mesas */
     .mesas-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      background: var(--blanco);
-      padding: 12px 8px;
-      border-radius: 12px;
-      border: 1px solid #e1e7e3;
-      text-align: center;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+      background: var(--blanco); padding: 10px 8px; border-radius: 12px;
+      border: 1px solid #e1e7e3; text-align: center;
     }
     .mesa-item span { display: block; font-size: 0.68rem; color: var(--texto-gris); text-transform: uppercase; }
     .mesa-item b { font-size: 0.88rem; color: var(--verde-oscuro); }
@@ -168,13 +121,11 @@
 <body>
 
   <div class="container">
-    <!-- Cabecera -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de Tiempo y Sincronización -->
     <div class="timer-container">
       <span id="hora-trep" style="color: var(--texto-gris);">Cargando TREP...</span>
       <div>
@@ -189,6 +140,12 @@
         <span class="pill pill-lista">Lista 9 (Alianza T.R.P)</span>
         <span class="pill pill-opcion">Opción 4</span>
       </div>
+
+      <!-- FOTO ARMANDO KEGLER -->
+      <div class="foto-kegler-container">
+        <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff'">
+      </div>
+
       <div class="cargo-sub">CONCEJAL MUNICIPAL</div>
       <div class="candidato-nombre">ARMANDO KEGLER SAUCEDO</div>
 
@@ -201,7 +158,7 @@
       </div>
     </div>
 
-    <!-- SECCIÓN INTENDENTE -->
+    <!-- INTENDENTE -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
@@ -210,9 +167,12 @@
 
       <!-- Lista 9 PEN -->
       <div class="fila-intendente int-pen">
-        <div class="int-info">
-          <h4>CONCEPCION MARTINEZ</h4>
-          <p>Lista 9 - Encuentro Nacional</p>
+        <div class="int-candidato-flex">
+          <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
+          <div class="int-info">
+            <h4>CONCEPCION MARTINEZ</h4>
+            <p>Lista 9 - PEN</p>
+          </div>
         </div>
         <div class="int-res">
           <strong id="martinez-votos" style="color: var(--naranja);">0</strong>
@@ -222,9 +182,12 @@
 
       <!-- Lista 1 ANR -->
       <div class="fila-intendente int-anr">
-        <div class="int-info">
-          <h4>HERNAN RIVAS</h4>
-          <p>Lista 1 - Partido Colorado</p>
+        <div class="int-candidato-flex">
+          <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
+          <div class="int-info">
+            <h4>HERNAN RIVAS</h4>
+            <p>Lista 1 - ANR</p>
+          </div>
         </div>
         <div class="int-res">
           <strong id="rivas-votos" style="color: var(--rojo-anr);">0</strong>
@@ -233,7 +196,7 @@
       </div>
     </div>
 
-    <!-- ESTADO DE MESAS -->
+    <!-- MESAS -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
@@ -259,13 +222,13 @@
         const data = await res.json();
         if (!data.ok) return;
 
-        // 1. Armando Kegler
+        // Armando Kegler
         document.getElementById('kegler-votos').innerText = 
           Number(data.concejal.armandoKegler.votosPreferenciales).toLocaleString('es-PY');
         document.getElementById('lista9-total-concejal').innerText = 
           Number(data.concejal.armandoKegler.totalLista9Concejales).toLocaleString('es-PY');
 
-        // 2. Intendentes
+        // Intendentes
         document.getElementById('martinez-votos').innerText = 
           Number(data.intendente.lista9.votos).toLocaleString('es-PY');
         document.getElementById('martinez-porc').innerText = data.intendente.lista9.porcentaje;
@@ -274,18 +237,17 @@
           Number(data.intendente.lista1.votos).toLocaleString('es-PY');
         document.getElementById('rivas-porc').innerText = data.intendente.lista1.porcentaje;
 
-        // 3. Mesas y Hora
+        // Mesas
         document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
         document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
         document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
-        document.getElementById('hora-trep').innerText = `TREP: ${data.servidorHora.split(' ')[1] || data.servidorHora}`;
+        document.getElementById('hora-trep').innerText = `TREP: ${data.servidorHora ? data.servidorHora.split(' ')[1] : 'Activo'}`;
 
       } catch (e) {
         console.error("Error al actualizar:", e);
       }
     }
 
-    // Cuenta regresiva
     setInterval(() => {
       timer--;
       document.getElementById('countdown').innerText = timer + "s";
