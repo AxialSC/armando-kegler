@@ -23,22 +23,15 @@
     /* Encabezado */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
-      color: var(--blanco);
-      padding: 16px 14px;
-      border-radius: 16px;
-      text-align: center;
-      box-shadow: 0 4px 15px rgba(0, 90, 40, 0.2);
-      margin-bottom: 12px;
-      position: relative;
+      color: var(--blanco); padding: 16px 14px; border-radius: 16px;
+      text-align: center; box-shadow: 0 4px 15px rgba(0, 90, 40, 0.2);
+      margin-bottom: 12px; position: relative;
     }
-    .header::after {
-      content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
-      background: var(--naranja);
-    }
+    .header::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 5px; background: var(--naranja); }
     .header h1 { font-size: 1.15rem; font-weight: 800; text-transform: uppercase; }
     .header p { font-size: 0.8rem; opacity: 0.9; margin-top: 2px; }
 
-    /* Barra del Reloj */
+    /* Reloj */
     .timer-container {
       display: flex; justify-content: space-between; align-items: center;
       background: var(--blanco); padding: 8px 14px; border-radius: 50px;
@@ -46,20 +39,17 @@
     }
     .timer-badge { background: var(--naranja); color: var(--blanco); font-weight: 700; padding: 3px 10px; border-radius: 20px; }
 
-    /* Tarjeta Principal Armando Kegler */
+    /* Tarjeta Armando Kegler */
     .card-kegler {
       background: var(--blanco); border-radius: 16px; padding: 16px;
       margin-bottom: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.06);
       border: 2px solid var(--verde-principal); text-align: center;
     }
     
-    /* Foto Armando Kegler */
     .foto-kegler-container {
       width: 100px; height: 100px; margin: 0 auto 10px auto;
-      border-radius: 50%; overflow: hidden;
-      border: 3px solid var(--naranja);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-      background: #eee;
+      border-radius: 50%; overflow: hidden; border: 3px solid var(--naranja);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15); background: #eee;
     }
     .foto-kegler-container img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -79,7 +69,7 @@
     .votos-numero { font-size: 2.8rem; font-weight: 900; color: var(--verde-principal); line-height: 1; }
     .votos-etiqueta { font-size: 0.75rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; margin-top: 4px; }
 
-    /* Tarjeta Intendente */
+    /* Intendentes */
     .card-secundaria {
       background: var(--blanco); border-radius: 16px; padding: 14px;
       margin-bottom: 14px; border: 1px solid #e1e7e3;
@@ -104,11 +94,11 @@
 
     .int-info h4 { font-size: 0.82rem; font-weight: 800; }
     .int-info p { font-size: 0.72rem; color: var(--texto-gris); }
-    .int-res { text-align: right; min-width: 60px; }
+    .int-res { text-align: right; min-width: 65px; }
     .int-res strong { font-size: 1.1rem; display: block; }
     .int-res span { font-size: 0.75rem; font-weight: 700; color: var(--texto-gris); }
 
-    /* Estado de Mesas */
+    /* Mesas */
     .mesas-grid {
       display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
       background: var(--blanco); padding: 10px 8px; border-radius: 12px;
@@ -127,21 +117,20 @@
     </div>
 
     <div class="timer-container">
-      <span id="hora-trep" style="color: var(--texto-gris);">Cargando TREP...</span>
+      <span id="hora-trep" style="color: var(--texto-gris);">TREP en tiempo real</span>
       <div>
         <span>Actualiza en: </span>
         <span class="timer-badge" id="countdown">60s</span>
       </div>
     </div>
 
-    <!-- CANDIDATO CENTRAL: ARMANDO KEGLER -->
+    <!-- SECCIÓN CONCEJAL ARMANDO KEGLER -->
     <div class="card-kegler">
       <div class="badges-top">
         <span class="pill pill-lista">Lista 9 (Alianza T.R.P)</span>
         <span class="pill pill-opcion">Opción 4</span>
       </div>
 
-      <!-- FOTO ARMANDO KEGLER -->
       <div class="foto-kegler-container">
         <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff'">
       </div>
@@ -151,21 +140,20 @@
 
       <div class="votos-display">
         <div class="votos-numero" id="kegler-votos">---</div>
-        <div class="votos-etiqueta">Votos Preferenciales Registrados</div>
+        <div class="votos-etiqueta">Votos Preferenciales Obtenidos</div>
       </div>
       <div style="font-size: 0.75rem; color: var(--texto-gris);">
-        Total de la Lista 9 (Concejales): <b id="lista9-total-concejal">0</b> votos
+        Total de Lista 9 (Concejales): <b id="lista9-total-concejal">---</b> votos
       </div>
     </div>
 
-    <!-- INTENDENTE -->
+    <!-- SECCIÓN INTENDENTE -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
         <span>Votos / %</span>
       </div>
 
-      <!-- Lista 9 PEN -->
       <div class="fila-intendente int-pen">
         <div class="int-candidato-flex">
           <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
@@ -175,12 +163,11 @@
           </div>
         </div>
         <div class="int-res">
-          <strong id="martinez-votos" style="color: var(--naranja);">0</strong>
-          <span id="martinez-porc">0%</span>
+          <strong id="martinez-votos" style="color: var(--naranja);">---</strong>
+          <span id="martinez-porc">---</span>
         </div>
       </div>
 
-      <!-- Lista 1 ANR -->
       <div class="fila-intendente int-anr">
         <div class="int-candidato-flex">
           <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
@@ -190,8 +177,8 @@
           </div>
         </div>
         <div class="int-res">
-          <strong id="rivas-votos" style="color: var(--rojo-anr);">0</strong>
-          <span id="rivas-porc">0%</span>
+          <strong id="rivas-votos" style="color: var(--rojo-anr);">---</strong>
+          <span id="rivas-porc">---</span>
         </div>
       </div>
     </div>
@@ -200,15 +187,15 @@
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
-        <b id="mesas-proc">0 / 71</b>
+        <b id="mesas-proc">---</b>
       </div>
       <div class="mesa-item">
         <span>Procesado</span>
-        <b id="mesas-porc" style="color: var(--naranja);">0%</b>
+        <b id="mesas-porc" style="color: var(--naranja);">---</b>
       </div>
       <div class="mesa-item">
         <span>Total Votos</span>
-        <b id="total-votos">0</b>
+        <b id="total-votos">---</b>
       </div>
     </div>
   </div>
@@ -220,7 +207,7 @@
       try {
         const res = await fetch('/api/resultados');
         const data = await res.json();
-        if (!data.ok) return;
+        if (!data || !data.ok) return;
 
         // Armando Kegler
         document.getElementById('kegler-votos').innerText = 
@@ -241,10 +228,10 @@
         document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
         document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
         document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
-        document.getElementById('hora-trep').innerText = `TREP: ${data.servidorHora ? data.servidorHora.split(' ')[1] : 'Activo'}`;
+        document.getElementById('hora-trep').innerText = `TREP: ${data.servidorHora.split(' ')[1] || data.servidorHora}`;
 
       } catch (e) {
-        console.error("Error al actualizar:", e);
+        console.error("Error al cargar:", e);
       }
     }
 
