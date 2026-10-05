@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TREP en Vivo - Armando Kegler</title>
 
-  <!-- METADATOS PARA WHATSAPP (Muestra logo.jpg) -->
+  <!-- METADATOS PARA WHATSAPP: USA EL BANNER LOGO.JPG -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
   <meta property="og:description" content="Conteo oficial en tiempo real - Tomás Romero Pereira">
@@ -206,7 +206,6 @@
     .mesa-item span { display: block; font-size: 0.58rem; color: var(--texto-gris); text-transform: uppercase; }
     .mesa-item b { font-size: 0.78rem; color: var(--verde-oscuro); }
 
-    /* FOOTER SUTIL AXIAL SECURITY */
     .footer-axial {
       display: flex;
       justify-content: center;
@@ -224,10 +223,6 @@
       align-items: center;
       gap: 4px;
       font-weight: 600;
-      transition: color 0.2s;
-    }
-    .footer-axial a:hover {
-      color: #25d366;
     }
     .wa-icon {
       width: 12px;
@@ -239,13 +234,11 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de tiempo -->
     <div class="timer-container">
       <span id="hora-trep" style="color: var(--texto-gris);">TREP: En Vivo</span>
       <div style="display: flex; align-items: center; gap: 6px;">
@@ -256,11 +249,12 @@
       </div>
     </div>
 
-    <!-- Armando Kegler -->
+    <!-- ARMANDO KEGLER -->
     <div class="card-kegler">
       <div class="kegler-top-row">
         <div class="foto-kegler-container">
-          <img src="logo.jpg" alt="Armando Kegler" onerror="this.src='kegler.jpg'; this.onerror=function(){this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';};">
+          <!-- CORREGIDO: Carga kegler.jpg (la cara) -->
+          <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';">
         </div>
         <div class="kegler-info">
           <div class="badges-top">
@@ -281,7 +275,7 @@
       </div>
     </div>
 
-    <!-- Intendente -->
+    <!-- INTENDENTE -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
@@ -317,7 +311,7 @@
       </div>
     </div>
 
-    <!-- Mesas -->
+    <!-- MESAS -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
@@ -333,7 +327,7 @@
       </div>
     </div>
 
-    <!-- PIE SUTIL: AXIAL SECURITY CON WHATSAPP -->
+    <!-- PIE AXIAL SECURITY -->
     <div class="footer-axial">
       <span>Designed & Developed by</span>
       <a href="https://wa.me/5491164148500?text=Hola%20Iv%C3%A1n%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20votaci%C3%B3n%20en%20vivo%20de%20Tom%C3%A1s%20Romero%20Pereira.%20%C2%BFMe%20podr%C3%ADas%20contactar%3F" target="_blank" rel="noopener noreferrer">
@@ -355,7 +349,6 @@
         const data = await res.json();
         if (!data || !data.ok) return;
 
-        // Armando Kegler
         if (data.concejal?.armandoKegler?.votosPreferenciales) {
           document.getElementById('kegler-votos').innerText = 
             Number(data.concejal.armandoKegler.votosPreferenciales).toLocaleString('es-PY');
@@ -365,7 +358,6 @@
             Number(data.concejal.armandoKegler.totalLista9Concejales).toLocaleString('es-PY');
         }
 
-        // Intendentes
         if (data.intendente?.lista9?.votos) {
           document.getElementById('martinez-votos').innerText = 
             Number(data.intendente.lista9.votos).toLocaleString('es-PY');
@@ -378,7 +370,6 @@
           document.getElementById('rivas-porc').innerText = data.intendente.lista1.porcentaje;
         }
 
-        // Mesas
         if (data.mesas?.procesadas && data.mesas?.total) {
           document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
           document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
@@ -389,10 +380,7 @@
           const partes = data.servidorHora.split(' ');
           document.getElementById('hora-trep').innerText = `TREP: ${partes[1] || data.servidorHora}`;
         }
-
-      } catch (e) {
-        // En silencio para no interrumpir la experiencia
-      }
+      } catch (e) {}
     }
 
     async function forzarActualizacion() {
