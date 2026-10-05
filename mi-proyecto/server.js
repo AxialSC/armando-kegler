@@ -5,13 +5,17 @@ const path = require('path');
 const app = express();
 app.use(cors());
 
-// CONTADOR DE VISITAS EN VIVO
-let contadorVisitas = 12; // Inicia con las visitas que ya tenés en GoatCounter
+// Inicia en 2 (exactamente lo que tiene GoatCounter en tu captura)
+let contadorVisitasReales = 2;
 
-// Cada vez que alguien entra a la web, suma una visita real
+// FILTRO ESTRICTO: Solo suma si una persona real abre la página principal
+// (Ignora las consultas automáticas de cada 10 segundos del panel)
 app.use((req, res, next) => {
-  if (req.path === '/' || req.path.endsWith('.html')) {
-    contadorVisitas++;
+  const esPaginaPrincipal = (req.path === '/' || req.path === '/index.html');
+  const esConsultaInterna = req.xhr || req.headers['accept']?.includes('application/json');
+
+  if (esPaginaPrincipal && !esConsultaInterna) {
+    contadorVisitasReales++;
   }
   next();
 });
@@ -23,7 +27,7 @@ const URL_CONCEJALES = "https://resultados.tsje.gov.py/publicacion/divulgacion.a
 
 let estadoActual = {
   ok: true,
-  visitasWeb: contadorVisitas,
+  visitasWeb: contadorVisitasReales,
   servidorHora: "04-10-2026 21:48:02",
   mesas: {
     total: 71,
@@ -45,56 +49,9 @@ let estadoActual = {
   }
 };
 
-async function consultarTSJE(url) {
-  const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-    'Accept': 'application/json, text/javascript, */*; q=0.01',
-    'Referer': 'https://resultados.tsje.gov.py/publicacion/divulgacion.html',
-    'X-Requested-With': 'XMLHttpRequest'
-  };
-  try {
-    const res = await fetch(`${url}&_=${Date.now()}`, { headers });
-    if (res.ok) return await res.json();
-  } catch (e) {}
-  return null;
-}
-
-app.get('/api/resultados', async (req, res) => {
-  // Suma visita al consultar
-  contadorVisitas++;
-  estadoActual.visitasWeb = contadorVisitas;
-
-  const [dataInt, dataConc] = await Promise.all([
-    consultarTSJE(URL_INTENDENTE),
-    consultarTSJE(URL_CONCEJALES)
-  ]);
-
-  if (dataInt && dataInt.candidatos) {
-    const l1 = dataInt.candidatos.find(c => c.numLista == 1);
-    const l9 = dataInt.candidatos.find(c => c.numLista == 9);
-    const tot = dataInt.totales?.totalVotos || 11871;
-    if (l1?.votos) {
-      estadoActual.intendente.lista1.votos = Number(l1.votos);
-      estadoActual.intendente.lista1.porcentaje = ((l1.votos / tot) * 100).toFixed(2) + "%";
-    }
-    if (l9?.votos) {
-      estadoActual.intendente.lista9.votos = Number(l9.votos);
-      estadoActual.intendente.lista9.porcentaje = ((l9.votos / tot) * 100).toFixed(2) + "%";
-    }
-    if (dataInt.horaFormated) estadoActual.servidorHora = dataInt.horaFormated;
-  }
-
-  if (dataConc && dataConc.candidatos) {
-    const l9c = dataConc.candidatos.find(c => c.numLista == 9);
-    if (l9c?.candidatosPref) {
-      const keg = l9c.candidatosPref.find(p => (p.nomCandidato && p.nomCandidato.includes("KEGLER")) || p.orden == 4);
-      if (keg?.votos || keg?.pref) {
-        estadoActual.concejal.armandoKegler.votosPreferenciales = Number(keg.votos || keg.pref);
-      }
-    }
-    if (dataConc.horaFormated) estadoActual.servidorHora = dataConc.horaFormated;
-  }
-
+app.get('/api/resultados', (req, res) => {
+  // Entrega el valor real SIN sumar nada
+  estadoActual.visitasWeb = contadorVisitasReales;
   res.json(estadoActual);
 });
 
