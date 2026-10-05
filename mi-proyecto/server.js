@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.6";
+const VERSION = "2.12.7";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -381,50 +381,57 @@ app.post("/api/visita", (req, res) => {
 
 app.get("/api/visitas", async (req, res) => {
   res.set("Cache-Control", "no-store");
-
-  // 1) Preferido: total de pageviews visible en el dashboard público de GoatCounter.
-  // Requiere GoatCounter -> Settings -> Dashboard viewable by -> Everyone/Public.
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
+    const timeout = setTimeout(() => controller.abort(), 6000);
     const r = await fetch("https://armando-kegler.goatcounter.com/?t=" + Date.now(), {
       signal: controller.signal,
       cache: "no-store",
+      redirect: "follow",
       headers: {
         "Accept": "text/html,application/xhtml+xml",
-        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.6"
+        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.7"
       }
     });
     clearTimeout(timeout);
-
     if (r.ok) {
       const html = await r.text();
-      const matches = [...html.matchAll(/(?:^|[^\d])([\d][\d.,]*)\s+visits\b/gi)];
-      const valores = matches
-        .map(m => Number(String(m[1]).replace(/\./g, "").replace(/,/g, "")))
-        .filter(Number.isFinite);
+      const plain = html
+        .replace(/<script[\s\S]*?<\/script>/gi, " ")
+        .replace(/<style[\s\S]*?<\/style>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/&amp;/gi, "&")
+        .replace(/\s+/g, " ")
+        .trim();
 
+      const candidatos = [];
+      for (const m of plain.matchAll(/([\d][\d.,]*)\s+out\s+of\s+([\d][\d.,]*)\s+visits\s+shown/gi)) {
+        candidatos.push(Number(String(m[2]).replace(/[.,]/g, "")));
+      }
+      for (const m of plain.matchAll(/Totals?.{0,80}?([\d][\d.,]*)\s+visits\b/gi)) {
+        candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
+      }
+      for (const m of plain.matchAll(/([\d][\d.,]*)\s+visits\b/gi)) {
+        candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
+      }
+
+      const valores = candidatos.filter(v => Number.isFinite(v) && v >= 0);
       if (valores.length) {
         const count = Math.max(...valores);
-        return res.json({
-          ok: true,
-          count,
-          source: "GOATCOUNTER_PAGEVIEWS",
-          localFallback: visitasLocales
-        });
+        console.log(`[${VERSION}] GOATCOUNTER dashboard total=${count}`);
+        return res.json({ ok:true, count, source:"GOATCOUNTER_DASHBOARD", localFallback:visitasLocales });
       }
     }
-  } catch (_) {
-    // Continuar con contador público.
+  } catch (err) {
+    console.warn(`[${VERSION}] GOATCOUNTER dashboard no disponible: ${err.message}`);
   }
 
-  // 2) Respaldo: contador público de GoatCounter.
   const urls = [
     "https://armando-kegler.goatcounter.com/counter/%2F.json",
     "https://armando-kegler.goatcounter.com/counter//.json",
     "https://armando-kegler.goatcounter.com/counter/TOTAL.json"
   ];
-
   for (const url of urls) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
@@ -434,33 +441,19 @@ app.get("/api/visitas", async (req, res) => {
         cache: "no-store",
         headers: { "Accept": "application/json,text/plain,*/*" }
       });
-
       if (r.ok) {
         const j = await r.json();
         const count = Number(j?.count);
         if (Number.isFinite(count)) {
-          return res.json({
-            ok: true,
-            count,
-            source: "GOATCOUNTER_PUBLIC",
-            localFallback: visitasLocales
-          });
+          return res.json({ ok:true, count, source:"GOATCOUNTER_PUBLIC", localFallback:visitasLocales });
         }
       }
     } catch (_) {
-      // Probar siguiente URL.
     } finally {
       clearTimeout(timeout);
     }
   }
-
-  // 3) Último respaldo: contador local de Render.
-  res.json({
-    ok: true,
-    count: visitasLocales,
-    source: "LOCAL_RENDER",
-    note: "Respaldo local: se reinicia si Render reinicia el proceso"
-  });
+  res.json({ ok:true, count:visitasLocales, source:"LOCAL_RENDER", note:"Respaldo local: se reinicia si Render reinicia el proceso" });
 });
 
 app.get("/api/resultados", (req, res) => {
