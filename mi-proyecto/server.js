@@ -4,9 +4,10 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.7";
+const VERSION = "2.12.8";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
+const GOATCOUNTER_ACCESS_TOKEN = process.env.GOATCOUNTER_ACCESS_TOKEN || "";
 
 app.use(cors());
 app.use(express.json({ limit: "512kb" }));
@@ -384,13 +385,14 @@ app.get("/api/visitas", async (req, res) => {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 6000);
-    const r = await fetch("https://armando-kegler.goatcounter.com/?t=" + Date.now(), {
+    const gcUrl = "https://armando-kegler.goatcounter.com/?" + (GOATCOUNTER_ACCESS_TOKEN ? "access-token=" + encodeURIComponent(GOATCOUNTER_ACCESS_TOKEN) + "&" : "") + "t=" + Date.now();
+    const r = await fetch(gcUrl, {
       signal: controller.signal,
       cache: "no-store",
       redirect: "follow",
       headers: {
         "Accept": "text/html,application/xhtml+xml",
-        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.7"
+        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.8"
       }
     });
     clearTimeout(timeout);
@@ -475,6 +477,7 @@ app.get("/api/health", (req, res) => {
     status: estadoActual.status,
     stale: estadoActual.stale,
     collectorConfigured: Boolean(COLLECTOR_TOKEN),
+    goatcounterConfigured: Boolean(GOATCOUNTER_ACCESS_TOKEN),
     ultimaRecepcion: estadoActual.ultimaRecepcion,
     edadSegundos: estadoActual.edadSegundos,
     ultimoCambio: estadoActual.ultimoCambio,
