@@ -1,11 +1,16 @@
 {
   "name": "trep-monitor",
-  "version": "1.0.0",
+  "version": "2.10.2",
+  "description": "Monitor TREP - Armando Kegler / Axial Security",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
+    "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2"
   }

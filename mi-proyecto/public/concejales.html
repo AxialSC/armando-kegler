@@ -1,232 +1,31 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Los 12 Concejales Electos - Tomás Romero Pereira</title>
-  <style>
-    :root {
-      --verde-oscuro: #005a28;
-      --verde-principal: #00873d;
-      --verde-claro: #e8f5e9;
-      --naranja: #f36c21;
-      --blanco: #ffffff;
-      --texto-oscuro: #1b262c;
-      --texto-gris: #55636b;
-      --rojo-anr: #d32f2f;
-      --amarillo-l1000: #eab308;
-      --azul-l123: #2563eb;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f0f4f1; color: var(--texto-oscuro); padding: 8px 10px; }
-    .container { max-width: 440px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: space-between; }
-
-    .header {
-      background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
-      color: var(--blanco); padding: 10px; border-radius: 12px;
-      text-align: center; margin-bottom: 8px; position: relative;
-    }
-    .header::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--naranja); }
-    .header h1 { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
-    .header p { font-size: 0.68rem; opacity: 0.9; }
-
-    /* Paginador superior */
-    .paginador {
-      display: flex; gap: 8px; margin-bottom: 8px;
-    }
-    .btn-pag {
-      flex: 1; padding: 8px; border: 1.5px solid var(--verde-principal);
-      border-radius: 10px; background: var(--blanco); font-size: 0.75rem;
-      font-weight: 800; color: var(--verde-oscuro); cursor: pointer; text-align: center;
-      transition: all 0.2s;
-    }
-    .btn-pag.activa {
-      background: var(--verde-principal); color: var(--blanco); box-shadow: 0 3px 6px rgba(0, 135, 61, 0.2);
-    }
-
-    /* Lista */
-    .lista-concejales { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
-
-    .concejal-row {
-      background: var(--blanco); border-radius: 10px; padding: 7px 9px;
-      display: flex; align-items: center; justify-content: space-between;
-      border-left: 5px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
-    }
-    .concejal-row.l1 { border-left-color: var(--rojo-anr); }
-    .concejal-row.l9 { border-left-color: var(--verde-principal); background: #fafffb; }
-    .concejal-row.l1000 { border-left-color: var(--amarillo-l1000); }
-    .concejal-row.l123 { border-left-color: var(--azul-l123); }
-
-    .concejal-row.kegler-highlight {
-      border: 2px solid var(--verde-principal);
-      border-left: 6px solid var(--naranja);
-      background: linear-gradient(to right, #f0fdf4, #ffffff);
-      box-shadow: 0 4px 10px rgba(0, 135, 61, 0.2);
-    }
-
-    .posicion { font-size: 0.85rem; font-weight: 900; color: var(--texto-gris); min-width: 22px; }
-    .datos-candidato { flex-grow: 1; padding: 0 6px; }
-    .datos-candidato h3 { font-size: 0.74rem; font-weight: 800; color: var(--texto-oscuro); line-height: 1.1; }
-    .datos-candidato p { font-size: 0.62rem; color: var(--texto-gris); }
-
-    .tag-electo {
-      font-size: 0.55rem; font-weight: 800; background: var(--verde-claro);
-      color: var(--verde-oscuro); padding: 1px 4px; border-radius: 4px;
-      border: 1px solid var(--verde-principal); display: inline-block;
-    }
-
-    .votos-badge { text-align: right; min-width: 55px; }
-    .votos-badge strong { font-size: 0.88rem; color: var(--texto-oscuro); display: block; line-height: 1; }
-    .votos-badge span { font-size: 0.58rem; color: var(--texto-gris); }
-
-    .btn-volver {
-      display: block; text-align: center; background: var(--verde-oscuro);
-      color: var(--blanco); text-decoration: none; font-size: 0.72rem;
-      font-weight: 800; padding: 8px; border-radius: 20px; margin-top: 8px;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="container">
-    <div>
-      <div class="header">
-        <h1>Concejales Electos (12 Bancas)</h1>
-        <p>Sistema D'Hondt + Voto Preferencial (Tomás Romero Pereira)</p>
-      </div>
-
-      <!-- Selector de Páginas de 6 en 6 -->
-      <div class="paginador">
-        <button class="btn-pag activa" id="btn-p1" onclick="cambiarPagina(1)">
-          Bancas 1 al 6
-        </button>
-        <button class="btn-pag" id="btn-p2" onclick="cambiarPagina(2)">
-          Bancas 7 al 12 (⭐ Kegler)
-        </button>
-      </div>
-
-      <!-- Contenedor de las 6 bancas -->
-      <div class="lista-concejales" id="tabla-ganadores"></div>
-    </div>
-
-    <a href="index.html" class="btn-volver">⬅ Volver al Cómputo Principal</a>
-  </div>
-
-  <script>
-    const datosElectorales = [
-      {
-        listaNombre: "Lista 1 - PARTIDO COLORADO",
-        codigoClase: "l1",
-        votosTotales: 5527,
-        candidatos: [
-          { nombre: "JUAN SAMIR AFARA ARGUELLO", pref: 889 },
-          { nombre: "EDGAR ORLANDO GONZALEZ", pref: 675 },
-          { nombre: "JUSTO MANUEL VIÑALES", pref: 574 },
-          { nombre: "MAGNO CHAVEZ RIVERO", pref: 493 },
-          { nombre: "ALAN ENRIQUE AMARILLA PAIVA", pref: 484 },
-          { nombre: "IRENEO GONZALEZ BRITEZ", pref: 467 },
-          { nombre: "ANDRES BENITEZ", pref: 451 }
-        ]
-      },
-      {
-        listaNombre: "Lista 9 - ALIANZA T.R.P",
-        codigoClase: "l9",
-        votosTotales: 2896,
-        candidatos: [
-          { nombre: "RAMON ANTONIO LOPEZ BRITEZ", pref: 691 },
-          { nombre: "FEDERICO DAMIAN FLORENTIN SEGOVIA", pref: 475 },
-          { nombre: "ARMANDO KEGLER SAUCEDO", pref: 328 }
-        ]
-      },
-      {
-        listaNombre: "Lista 1000 - UNIDOS",
-        codigoClase: "l1000",
-        votosTotales: 1570,
-        candidatos: [{ nombre: "BELGRANO CIBILS", pref: 328 }]
-      },
-      {
-        listaNombre: "Lista 123 - YO CREO",
-        codigoClase: "l123",
-        votosTotales: 921,
-        candidatos: [{ nombre: "PEDRO ALFONSO ESCOBAR", pref: 288 }]
-      }
-    ];
-
-    function calcular12Concejales() {
-      const cocientes = [];
-      datosElectorales.forEach(p => {
-        for (let d = 1; d <= 12; d++) {
-          cocientes.push({ partido: p.listaNombre, clase: p.codigoClase, cociente: p.votosTotales / d });
-        }
-      });
-      cocientes.sort((a, b) => b.cociente - a.cociente);
-      const top12 = cocientes.slice(0, 12);
-
-      const bancasPorPartido = {};
-      top12.forEach(b => bancasPorPartido[b.partido] = (bancasPorPartido[b.partido] || 0) + 1);
-
-      const ganadores = [];
-      datosElectorales.forEach(p => {
-        const numBancas = bancasPorPartido[p.listaNombre] || 0;
-        const ord = [...p.candidatos].sort((a, b) => b.pref - a.pref);
-        for (let i = 0; i < numBancas; i++) {
-          if (ord[i]) {
-            ganadores.push({
-              nombre: ord[i].nombre,
-              partido: p.listaNombre,
-              clase: p.codigoClase,
-              pref: ord[i].pref,
-              bancaPart: i + 1
-            });
-          }
-        }
-      });
-
-      ganadores.sort((a, b) => b.pref - a.pref);
-      return ganadores;
-    }
-
-    const todosLosConcejales = calcular12Concejales();
-    let paginaActual = 1;
-
-    function renderizarPagina(pag) {
-      paginaActual = pag;
-      document.getElementById('btn-p1').className = `btn-pag ${pag === 1 ? 'activa' : ''}`;
-      document.getElementById('btn-p2').className = `btn-pag ${pag === 2 ? 'activa' : ''}`;
-
-      const inicio = (pag - 1) * 6;
-      const fin = inicio + 6;
-      const grupo = todosLosConcejales.slice(inicio, fin);
-
-      const cont = document.getElementById('tabla-ganadores');
-      cont.innerHTML = "";
-
-      grupo.forEach((c, idx) => {
-        const posReal = inicio + idx + 1;
-        const esKegler = c.nombre.includes("KEGLER");
-        const div = document.createElement('div');
-        div.className = `concejal-row ${c.clase} ${esKegler ? 'kegler-highlight' : ''}`;
-
-        div.innerHTML = `
-          <div class="posicion">#${posReal}</div>
-          <div class="datos-candidato">
-            <h3>${c.nombre} ${esKegler ? '<span class="tag-electo">¡OPCIÓN 4!</span>' : ''}</h3>
-            <p>${c.partido.split(' - ')[0]} (Banca ${c.bancaPart})</p>
-          </div>
-          <div class="votos-badge">
-            <strong style="${esKegler ? 'color: var(--naranja); font-size: 0.95rem;' : ''}">${c.pref.toLocaleString('es-PY')}</strong>
-            <span>Votos Pref.</span>
-          </div>
-        `;
-        cont.appendChild(div);
-      });
-    }
-
-    function cambiarPagina(p) { renderizarPagina(p); }
-
-    // Iniciar en página 1
-    renderizarPagina(1);
-  </script>
-</body>
-</html>
+<html lang="es"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#071226"><title>12 Concejales Electos · v2.10.2</title>
+<style>
+:root{--v:#00873d;--vo:#005a28;--n:#f36c21;--r:#d32f2f;--y:#eab308;--b:#2563eb;--g:#55636b;--w:#fff;--bg:#081326}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+html,body{min-height:100%;background:var(--bg)}body{display:flex;justify-content:center;padding:24px 0;color:#1b262c}
+.phone{width:min(445px,100vw);min-height:820px;background:#f0f4f1;border:10px solid #26364a;border-radius:42px;padding:0 10px 10px;box-shadow:0 20px 50px #0007}.notch{width:110px;height:18px;background:#26364a;border-radius:0 0 12px 12px;margin:auto}
+header{background:linear-gradient(135deg,var(--vo),var(--v));color:#fff;padding:10px;border-radius:12px;text-align:center;border-bottom:3px solid var(--n);margin-bottom:8px}h1{font-size:.95rem;text-transform:uppercase}header p{font-size:.65rem}.ver{font-size:.57rem;opacity:.8}
+.status{background:#fff;border:1px solid #ddd;border-radius:20px;padding:6px 10px;font-size:.65rem;margin-bottom:8px;display:flex;justify-content:space-between}.live{font-weight:900;color:#16a34a}.stale{color:#d97706}.err{color:#dc2626}
+.tabs{display:flex;gap:6px;margin-bottom:8px}.tab{flex:1;padding:8px 4px;border:1.5px solid var(--v);border-radius:9px;background:#fff;color:var(--vo);font-size:.69rem;font-weight:900}.tab.on{background:var(--v);color:#fff}
+.list{display:flex;flex-direction:column;gap:6px}.row{background:#fff;border-radius:10px;padding:9px 8px;display:flex;align-items:center;border-left:5px solid #ccc;box-shadow:0 2px 5px #0000000b}.r{border-left-color:var(--r)}.g{border-left-color:var(--v)}.y{border-left-color:var(--y)}.b{border-left-color:var(--b)}.k{border:2px solid var(--v);border-left:6px solid var(--n);background:linear-gradient(90deg,#f0fdf4,#fff)}
+.pos{font-size:.82rem;font-weight:900;color:var(--g);min-width:27px}.data{flex:1;padding:0 5px}.data h3{font-size:.7rem;line-height:1.15}.data p{font-size:.58rem;color:var(--g);margin-top:2px}.vote{text-align:right;min-width:52px}.vote strong{display:block;font-size:.87rem}.vote span{font-size:.54rem;color:var(--g)}.tag{font-size:.5rem;background:#fff7ed;color:#c2410c;border:1px solid var(--n);padding:1px 4px;border-radius:4px}
+.back{display:block;text-align:center;background:var(--vo);color:#fff;text-decoration:none;font-size:.7rem;font-weight:900;padding:9px;border-radius:20px;margin-top:9px}.foot{text-align:center;color:#718096;font-size:.58rem;margin-top:7px}
+@media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:8px;border-radius:36px}}
+</style></head><body><main class="phone"><div class="notch"></div>
+<header><h1>Concejales Electos · 12 Bancas</h1><p>Tomás Romero Pereira · D'Hondt / Voto Preferencial</p><div class="ver">v2.10.2</div></header>
+<div class="status"><span id="st" class="live">● Conectando</span><span>Corte: <b id="corte">--:--:--</b></span></div>
+<div class="tabs"><button id="p1" class="tab on">Bancas 1 al 6</button><button id="p2" class="tab">Bancas 7 al 12 · ⭐ Kegler</button></div>
+<section id="list" class="list"></section>
+<a class="back" href="index.html">⬅ Volver al Cómputo Principal</a><div class="foot">Designed & Developed by Axial Security</div>
+</main><script>
+const base=[
+[1,"JUAN SAMIR AFARA","L1 - ANR",889,"r"],[2,"RAMON ANTONIO LOPEZ","L9 - TRP",691,"g"],[3,"EDGAR ORLANDO GONZALEZ","L1 - ANR",675,"r"],[4,"JUSTO MANUEL VIÑALES","L1 - ANR",574,"r"],[5,"BELGRANO CIBILS","L1000 - UNIDOS",328,"y"],[6,"FEDERICO FLORENTIN","L9 - TRP",475,"g"],[7,"MAGNO CHAVEZ RIVERO","L1 - ANR",493,"r"],[8,"ALAN ENRIQUE AMARILLA","L1 - ANR",484,"r"],[9,"ARMANDO KEGLER","L9 - TRP · Opción 4",328,"g k"],[10,"IRENEO GONZALEZ BRITEZ","L1 - ANR",467,"r"],[11,"PEDRO ALFONSO ESCOBAR","L123 - YO CREO",288,"b"],[12,"ANDRES BENITEZ","L1 - ANR",451,"r"]];
+let page=1;const $=x=>document.getElementById(x),fmt=n=>Number(n).toLocaleString("es-PY");
+function render(){$("p1").classList.toggle("on",page===1);$("p2").classList.toggle("on",page===2);$("list").innerHTML=base.slice((page-1)*6,page*6).map(c=>`<div class="row ${c[4]}"><span class="pos">#${c[0]}</span><div class="data"><h3>${c[1]} ${c[1].includes("KEGLER")?'<span class="tag">OPCIÓN 4</span>':''}</h3><p>${c[2]}</p></div><div class="vote"><strong>${fmt(c[3])}</strong><span>Votos Pref.</span></div></div>`).join("")}
+$("p1").onclick=()=>{page=1;render()};$("p2").onclick=()=>{page=2;render()};render();
+function time(s){let m=String(s||"").match(/(\d{2}:\d{2}:\d{2})/);return m?m[1]:"--:--:--"}
+async function sync(){try{let r=await fetch("/api/resultados?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error();let d=await r.json();$("corte").textContent=time(d.servidorHora);let s=$("st");if(d.ok&&!d.stale){s.textContent="● En Vivo";s.className="live"}else{s.textContent="● Último dato";s.className="live stale"}if(d.concejal?.armandoKegler?.votosPreferenciales!=null){let k=base.find(x=>x[1]==="ARMANDO KEGLER");k[3]=d.concejal.armandoKegler.votosPreferenciales;render()}}catch(e){$("st").textContent="● Sin conexión";$("st").className="live err"}}sync();setInterval(sync,60000);
+</script></body></html>
