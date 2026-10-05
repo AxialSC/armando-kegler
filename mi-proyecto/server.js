@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.11.0";
+const VERSION = "2.11.1";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -105,22 +105,30 @@ function parsearCarga(body) {
 
   const martinez = buscarCandidato(intData, ["CONCEPCION", "MARTINEZ"]);
   const rivas = buscarCandidato(intData, ["HERNAN", "RIVAS"]);
-  const kegler = buscarCandidato(conData, ["ARMANDO", "KEGLER"]);
 
-  if (!martinez || !rivas || !kegler) {
-    throw new Error("Faltan candidatos esperados en los datos recibidos");
+  const listasConcejales = Array.isArray(conData?.candidatos) ? conData.candidatos : [];
+  const lista9 = listasConcejales.find(x => String(x?.numLista) === "9");
+  const preferenciasLista9 = Array.isArray(lista9?.candidatosPref) ? lista9.candidatosPref : [];
+  const kegler = preferenciasLista9.find(c =>
+    normalizar(c?.nomCandidato).includes("ARMANDO") &&
+    normalizar(c?.nomCandidato).includes("KEGLER")
+  );
+
+  if (!martinez || !rivas || !lista9 || !kegler) {
+    throw new Error("Faltan datos esperados de intendente o preferencias de Lista 9");
   }
 
   const vm = Number(martinez.votos);
   const vr = Number(rivas.votos);
   const vk = Number(kegler.votos);
+  const totalLista9 = Number(lista9.votos);
 
   const totales = intData.totales || {};
   const totalVotos = Number(totales.totalVotos);
   const totalMesas = Number(totales.totalMesas);
   const mesasPublicadas = Number(totales.mesasPublicadas);
 
-  if (![vm, vr, vk].every(esEnteroNoNegativo)) {
+  if (![vm, vr, vk, totalLista9].every(esEnteroNoNegativo)) {
     throw new Error("Los votos recibidos no son válidos");
   }
   if (!esEnteroNoNegativo(totalVotos) ||
@@ -160,10 +168,7 @@ function parsearCarga(body) {
         nombre: "ARMANDO KEGLER SAUCEDO",
         orden: 4,
         votosPreferenciales: vk,
-        // Se conserva hasta que definamos qué campo oficial representa
-        // inequívocamente el total de la Lista 9 para concejales.
-        totalLista9Concejales:
-          estadoActual.concejal.armandoKegler.totalLista9Concejales
+        totalLista9Concejales: totalLista9
       }
     }
   };
