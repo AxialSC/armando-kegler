@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TREP en Vivo - Armando Kegler</title>
 
+  <!-- GOATCOUNTER: MÉTRICAS Y VISITAS EN TIEMPO REAL -->
+  <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
   <!-- METADATOS PARA WHATSAPP -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
@@ -26,33 +29,81 @@
       --rojo-anr: #d32f2f;
       --amarillo-l1000: #eab308;
       --azul-l123: #2563eb;
+      --chasis-celular: #1e293b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
     html, body {
       height: 100%;
-      background-color: #f0f4f1;
+      background-color: #0b1329; /* Fondo oscuro elegante en PC para destacar el celular */
       color: var(--texto-oscuro);
       overflow-x: hidden;
     }
 
     body {
       display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    /* =========================================
+       MARCO DE CELULAR SMARTPHONE (RESPONSIVO)
+       ========================================= */
+    .phone-wrapper {
+      width: 100%;
+      max-width: 440px;
+      height: 100dvh;
+      background-color: #f0f4f1;
+      position: relative;
+      display: flex;
       flex-direction: column;
-      padding: 6px 10px;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* En pantallas medianas y de PC: le damos el chasis de celular real */
+    @media (min-width: 480px) {
+      body {
+        padding: 16px;
+      }
+      .phone-wrapper {
+        height: 840px;
+        max-height: 94vh;
+        border: 10px solid var(--chasis-celular);
+        border-radius: 42px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.1);
+      }
+      /* Isla / Parlante superior del teléfono */
+      .phone-notch {
+        display: block;
+        width: 110px;
+        height: 16px;
+        background: var(--chasis-celular);
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 100;
+      }
+    }
+
+    @media (max-width: 479px) {
+      .phone-notch { display: none; }
+      .phone-wrapper { border: none; border-radius: 0; }
     }
 
     .container {
-      max-width: 440px;
-      margin: 0 auto;
       width: 100%;
-      height: 100dvh;
+      height: 100%;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       gap: 5px;
-      padding-bottom: 2px;
+      padding: 8px 10px 4px 10px;
     }
 
     /* 1. Header */
@@ -131,11 +182,9 @@
       top: 0; left: 0;
     }
 
-    .flip-back {
-      transform: rotateY(180deg);
-    }
+    .flip-back { transform: rotateY(180deg); }
 
-    /* --- TARJETA SUPERIOR (ARMANDO) --- */
+    /* TARJETA SUPERIOR (ARMANDO) */
     #tarjeta-kegler {
       flex-grow: 1;
       display: flex;
@@ -252,7 +301,7 @@
     .nombre-mini { flex-grow: 1; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.66rem; }
     .votos-mini { font-weight: 800; color: var(--texto-oscuro); min-width: 32px; text-align: right; }
 
-    /* --- TARJETA INFERIOR (INTENDENTE / BANCAS TRASERA) --- */
+    /* TARJETA INFERIOR (INTENDENTE / BANCAS TRASERA) */
     #tarjeta-inferior {
       height: 125px;
       flex-shrink: 0;
@@ -286,7 +335,7 @@
     .int-res strong { font-size: 0.88rem; display: block; line-height: 1.1; }
     .int-res span { font-size: 0.62rem; font-weight: 700; color: var(--texto-gris); }
 
-    /* DORSO ABAJO: DISTRIBUCIÓN DE BANCAS D'HONDT */
+    /* DORSO ABAJO: DISTRIBUCIÓN DE BANCAS */
     .flip-back-bancas {
       background: var(--blanco);
       border-radius: 12px;
@@ -341,182 +390,186 @@
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <h1>Tomás Romero Pereira</h1>
-      <p>Elecciones Municipales - Datos Oficiales TREP</p>
-    </div>
+  <!-- ENVOLTORIO MARCO DE CELULAR -->
+  <div class="phone-wrapper">
+    <div class="phone-notch"></div>
 
-    <!-- Barra de Tiempo -->
-    <div class="timer-container">
-      <span id="hora-trep">
-        <span class="live-dot">● En Vivo</span> | Corte: <span id="hora-valor">21:48:02</span>
-      </span>
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span class="timer-badge" id="countdown">60s</span>
-        <button class="btn-refresh" id="btn-refresh" onclick="forzarActualizacion(event)">
-          🔄 Actualizar
-        </button>
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>Tomás Romero Pereira</h1>
+        <p>Elecciones Municipales - Datos Oficiales TREP</p>
       </div>
-    </div>
 
-    <!-- TARJETA SUPERIOR CON FLIP (ARMANDO / CONCEJALES) -->
-    <div class="flip-box" id="tarjeta-kegler" onclick="dispararDobleGiro()">
-      <div class="flip-box-inner">
-        
-        <!-- FRENTE: ARMANDO -->
-        <div class="flip-front flip-front-kegler">
-          <div class="globo-hint">
-            <span>👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS 🔄</span>
-          </div>
+      <!-- Barra de Tiempo -->
+      <div class="timer-container">
+        <span id="hora-trep">
+          <span class="live-dot">● En Vivo</span> | Corte: <span id="hora-valor">21:48:02</span>
+        </span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="timer-badge" id="countdown">60s</span>
+          <button class="btn-refresh" id="btn-refresh" onclick="forzarActualizacion(event)">
+            🔄 Actualizar
+          </button>
+        </div>
+      </div>
 
-          <div class="kegler-top-row">
-            <div class="foto-kegler-container">
-              <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';">
+      <!-- TARJETA SUPERIOR: ARMANDO / CONCEJALES -->
+      <div class="flip-box" id="tarjeta-kegler" onclick="dispararDobleGiro()">
+        <div class="flip-box-inner">
+          
+          <!-- FRENTE: ARMANDO -->
+          <div class="flip-front flip-front-kegler">
+            <div class="globo-hint">
+              <span>👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS 🔄</span>
             </div>
-            <div class="kegler-info">
-              <div class="badges-top">
-                <span class="pill pill-lista">Lista 9</span>
-                <span class="pill pill-opcion">Opción 4</span>
+
+            <div class="kegler-top-row">
+              <div class="foto-kegler-container">
+                <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';">
               </div>
-              <div class="cargo-sub">CONCEJAL MUNICIPAL</div>
-              <div class="candidato-nombre">ARMANDO KEGLER</div>
-            </div>
-          </div>
-
-          <div class="votos-display">
-            <div class="votos-numero" id="kegler-votos">328</div>
-            <div class="votos-etiqueta">Votos Preferenciales Obtenidos</div>
-          </div>
-
-          <div class="subtotal-txt">
-            Total Lista 9 (Concejales): <b id="lista9-total-concejal">3.840</b> votos
-          </div>
-        </div>
-
-        <!-- DORSO: 12 CONCEJALES ELECTOS (EN 2 PÁGINAS DE 6) -->
-        <div class="flip-back flip-back-kegler">
-          <div class="back-header">
-            <h2>🏆 12 Concejales Electos (D'Hondt)</h2>
-            <span class="tag-temporizador" id="segundos-restantes">Auto-regresa en 6s</span>
-          </div>
-
-          <div class="tabs-pag">
-            <button class="tab-btn activa" id="tab-p1" onclick="verPaginaConcejales(1, event)">
-              Bancas 1 al 6
-            </button>
-            <button class="tab-btn" id="tab-p2" onclick="verPaginaConcejales(2, event)">
-              Bancas 7 al 12 (⭐ Kegler)
-            </button>
-          </div>
-
-          <div class="back-lista" id="back-lista-filas"></div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- TARJETA INFERIOR CON FLIP (INTENDENTES / BANCAS D'HONDT) -->
-    <div class="flip-box" id="tarjeta-inferior" onclick="dispararDobleGiro()">
-      <div class="flip-box-inner">
-        
-        <!-- FRENTE: INTENDENTE -->
-        <div class="flip-front flip-front-int">
-          <div class="seccion-titulo">
-            <span>Intendente Municipal</span>
-            <span>Votos / %</span>
-          </div>
-
-          <div class="fila-intendente int-pen">
-            <div class="int-candidato-flex">
-              <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
-              <div class="int-info">
-                <h4>CONCEPCION MARTINEZ</h4>
-                <p>Lista 9 - PEN</p>
+              <div class="kegler-info">
+                <div class="badges-top">
+                  <span class="pill pill-lista">Lista 9</span>
+                  <span class="pill pill-opcion">Opción 4</span>
+                </div>
+                <div class="cargo-sub">CONCEJAL MUNICIPAL</div>
+                <div class="candidato-nombre">ARMANDO KEGLER</div>
               </div>
             </div>
-            <div class="int-res">
-              <strong id="martinez-votos" style="color: var(--naranja);">6.919</strong>
-              <span id="martinez-porc">58.28%</span>
+
+            <div class="votos-display">
+              <div class="votos-numero" id="kegler-votos">328</div>
+              <div class="votos-etiqueta">Votos Preferenciales Obtenidos</div>
+            </div>
+
+            <div class="subtotal-txt">
+              Total Lista 9 (Concejales): <b id="lista9-total-concejal">3.840</b> votos
             </div>
           </div>
 
-          <div class="fila-intendente int-anr">
-            <div class="int-candidato-flex">
-              <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
-              <div class="int-info">
-                <h4>HERNAN RIVAS</h4>
-                <p>Lista 1 - ANR</p>
+          <!-- DORSO: 12 CONCEJALES -->
+          <div class="flip-back flip-back-kegler">
+            <div class="back-header">
+              <h2>🏆 12 Concejales Electos (D'Hondt)</h2>
+              <span class="tag-temporizador" id="segundos-restantes">Auto-regresa en 6s</span>
+            </div>
+
+            <div class="tabs-pag">
+              <button class="tab-btn activa" id="tab-p1" onclick="verPaginaConcejales(1, event)">
+                Bancas 1 al 6
+              </button>
+              <button class="tab-btn" id="tab-p2" onclick="verPaginaConcejales(2, event)">
+                Bancas 7 al 12 (⭐ Kegler)
+              </button>
+            </div>
+
+            <div class="back-lista" id="back-lista-filas"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- TARJETA INFERIOR: INTENDENTE / BANCAS -->
+      <div class="flip-box" id="tarjeta-inferior" onclick="dispararDobleGiro()">
+        <div class="flip-box-inner">
+          
+          <!-- FRENTE: INTENDENTE -->
+          <div class="flip-front flip-front-int">
+            <div class="seccion-titulo">
+              <span>Intendente Municipal</span>
+              <span>Votos / %</span>
+            </div>
+
+            <div class="fila-intendente int-pen">
+              <div class="int-candidato-flex">
+                <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
+                <div class="int-info">
+                  <h4>CONCEPCION MARTINEZ</h4>
+                  <p>Lista 9 - PEN</p>
+                </div>
+              </div>
+              <div class="int-res">
+                <strong id="martinez-votos" style="color: var(--naranja);">6.919</strong>
+                <span id="martinez-porc">58.28%</span>
               </div>
             </div>
-            <div class="int-res">
-              <strong id="rivas-votos" style="color: var(--rojo-anr);">4.535</strong>
-              <span id="rivas-porc">38.20%</span>
+
+            <div class="fila-intendente int-anr">
+              <div class="int-candidato-flex">
+                <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
+                <div class="int-info">
+                  <h4>HERNAN RIVAS</h4>
+                  <p>Lista 1 - ANR</p>
+                </div>
+              </div>
+              <div class="int-res">
+                <strong id="rivas-votos" style="color: var(--rojo-anr);">4.535</strong>
+                <span id="rivas-porc">38.20%</span>
+              </div>
             </div>
           </div>
+
+          <!-- DORSO: CUADRO DE BANCAS D'HONDT -->
+          <div class="flip-back flip-back-bancas">
+            <div class="banner-electo-mini">
+              <h3>🎉 ¡ARMANDO KEGLER ELECTO CONCEJAL!</h3>
+              <p>La Lista 9 aseguró <b>3 bancas</b> y Armando ingresa como el <b>3.° más votado</b> de su lista.</p>
+            </div>
+
+            <div class="bancas-grid-mini">
+              <div class="banca-item-mini" style="border-top: 2.5px solid var(--rojo-anr);">
+                <span>Lista 1 (ANR)</span>
+                <strong style="color: var(--rojo-anr);">7</strong>
+              </div>
+              <div class="banca-item-mini" style="border-top: 2.5px solid var(--verde-principal); background: #ecfdf5;">
+                <span>Lista 9 (TRP)</span>
+                <strong style="color: var(--verde-principal);">3</strong>
+              </div>
+              <div class="banca-item-mini" style="border-top: 2.5px solid var(--amarillo-l1000);">
+                <span>Lista 1000</span>
+                <strong style="color: var(--amarillo-l1000);">1</strong>
+              </div>
+              <div class="banca-item-mini" style="border-top: 2.5px solid var(--azul-l123);">
+                <span>Lista 123</span>
+                <strong style="color: var(--azul-l123);">1</strong>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </div>
 
-        <!-- DORSO: EL CUADRO DE BANCAS D'HONDT -->
-        <div class="flip-back flip-back-bancas">
-          <div class="banner-electo-mini">
-            <h3>🎉 ¡ARMANDO KEGLER ELECTO CONCEJAL!</h3>
-            <p>La Lista 9 aseguró <b>3 bancas</b> y Armando ingresa como el <b>3.° más votado</b> de su lista.</p>
-          </div>
-
-          <div class="bancas-grid-mini">
-            <div class="banca-item-mini" style="border-top: 2.5px solid var(--rojo-anr);">
-              <span>Lista 1 (ANR)</span>
-              <strong style="color: var(--rojo-anr);">7</strong>
-            </div>
-            <div class="banca-item-mini" style="border-top: 2.5px solid var(--verde-principal); background: #ecfdf5;">
-              <span>Lista 9 (TRP)</span>
-              <strong style="color: var(--verde-principal);">3</strong>
-            </div>
-            <div class="banca-item-mini" style="border-top: 2.5px solid var(--amarillo-l1000);">
-              <span>Lista 1000</span>
-              <strong style="color: var(--amarillo-l1000);">1</strong>
-            </div>
-            <div class="banca-item-mini" style="border-top: 2.5px solid var(--azul-l123);">
-              <span>Lista 123</span>
-              <strong style="color: var(--azul-l123);">1</strong>
-            </div>
-          </div>
+      <!-- MESAS -->
+      <div class="mesas-grid">
+        <div class="mesa-item">
+          <span>Mesas</span>
+          <b id="mesas-proc">71 / 71</b>
         </div>
+        <div class="mesa-item">
+          <span>Procesado</span>
+          <b id="mesas-porc" style="color: var(--naranja);">100.00%</b>
+        </div>
+        <div class="mesa-item">
+          <span>Total Votos</span>
+          <b id="total-votos">11.871</b>
+        </div>
+      </div>
 
+      <!-- Pie Axial Security -->
+      <div class="footer-axial">
+        <span>Designed & Developed by</span>
+        <a href="https://wa.me/5491164148500?text=Hola%20Iv%C3%A1n%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20votaci%C3%B3n%20en%20vivo%20de%20Tom%C3%A1s%20Romero%20Pereira.%20%C2%BFMe%20podr%C3%ADas%20contactar%3F" target="_blank" rel="noopener noreferrer">
+          <svg class="wa-icon" viewBox="0 0 24 24">
+            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+          </svg>
+          Axial Security
+        </a>
       </div>
-    </div>
-
-    <!-- MESAS -->
-    <div class="mesas-grid">
-      <div class="mesa-item">
-        <span>Mesas</span>
-        <b id="mesas-proc">71 / 71</b>
-      </div>
-      <div class="mesa-item">
-        <span>Procesado</span>
-        <b id="mesas-porc" style="color: var(--naranja);">100.00%</b>
-      </div>
-      <div class="mesa-item">
-        <span>Total Votos</span>
-        <b id="total-votos">11.871</b>
-      </div>
-    </div>
-
-    <!-- Pie Axial Security -->
-    <div class="footer-axial">
-      <span>Designed & Developed by</span>
-      <a href="https://wa.me/5491164148500?text=Hola%20Iv%C3%A1n%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20votaci%C3%B3n%20en%20vivo%20de%20Tom%C3%A1s%20Romero%20Pereira.%20%C2%BFMe%20podr%C3%ADas%20contactar%3F" target="_blank" rel="noopener noreferrer">
-        <svg class="wa-icon" viewBox="0 0 24 24">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
-        </svg>
-        Axial Security
-      </a>
     </div>
   </div>
 
   <script>
-    // LISTA OFICIAL D'HONDT
     const concejalesOficiales = [
       { pos: 1, nombre: "JUAN SAMIR AFARA", partido: "L1 - ANR", votos: 889, clase: "l1", esKegler: false },
       { pos: 2, nombre: "RAMON ANTONIO LOPEZ", partido: "L9 - TRP", votos: 691, clase: "l9", esKegler: false },
@@ -533,7 +586,6 @@
       { pos: 12, nombre: "ANDRES BENITEZ", partido: "L1 - ANR", votos: 451, clase: "l1", esKegler: false }
     ];
 
-    // GIRO EN CASCADA CON REGRESO A LOS 6 SEGUNDOS
     let giradoActivo = false;
     let timerAutoRegreso = null;
     let intervaloCuentaRegresiva = null;
@@ -545,11 +597,8 @@
       }
 
       giradoActivo = true;
-
-      // 1. Giro Arriba
       document.getElementById('tarjeta-kegler').classList.add('girado');
 
-      // 2. Giro Abajo con delay de 0.45s (Efecto cascada)
       setTimeout(() => {
         if (giradoActivo) {
           document.getElementById('tarjeta-inferior').classList.add('girado');
@@ -609,7 +658,6 @@
 
     verPaginaConcejales(1);
 
-    // SISTEMA EN TIEMPO REAL
     let timer = 60;
 
     async function actualizarTREP() {
