@@ -55,6 +55,7 @@
       padding-bottom: 2px;
     }
 
+    /* 1. Header */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
       color: var(--blanco);
@@ -68,6 +69,7 @@
     .header h1 { font-size: 0.92rem; font-weight: 800; text-transform: uppercase; }
     .header p { font-size: 0.65rem; opacity: 0.9; }
 
+    /* 2. Barra de Estado */
     .timer-container {
       display: flex;
       justify-content: space-between;
@@ -98,31 +100,27 @@
     .btn-refresh:active { transform: scale(0.95); background: var(--verde-oscuro); }
 
     /* =========================================
-       SISTEMA 3D FLIP CARD
+       SISTEMA 3D FLIP SINCRONIZADO EN CASCADA
        ========================================= */
-    .flip-container {
+    .flip-box {
       perspective: 1000px;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
-      min-height: 245px;
-      max-height: 42dvh;
+      width: 100%;
+      cursor: pointer;
     }
 
-    .flip-card-inner {
+    .flip-box-inner {
       position: relative;
       width: 100%;
       height: 100%;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
       transform-style: preserve-3d;
-      flex-grow: 1;
     }
 
-    .flip-container.girado .flip-card-inner {
+    .flip-box.girado .flip-box-inner {
       transform: rotateY(180deg);
     }
 
-    .flip-card-front, .flip-card-back {
+    .flip-front, .flip-back {
       position: absolute;
       width: 100%;
       height: 100%;
@@ -133,8 +131,21 @@
       top: 0; left: 0;
     }
 
-    /* CARA FRONTAL */
-    .flip-card-front {
+    .flip-back {
+      transform: rotateY(180deg);
+    }
+
+    /* --- TARJETA SUPERIOR (ARMANDO) --- */
+    #tarjeta-kegler {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 245px;
+      max-height: 42dvh;
+    }
+    #tarjeta-kegler .flip-box-inner { flex-grow: 1; }
+
+    .flip-front-kegler {
       background: var(--blanco);
       border: 1.5px solid var(--verde-principal);
       padding: 6px 10px;
@@ -142,21 +153,18 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      cursor: pointer;
     }
 
-    /* CARTEL LLAMATIVO Y PARPADEANTE CADA 1 SEGUNDO */
     .globo-hint {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 5px;
-      font-size: 0.76rem; /* MÁS GRANDE */
+      font-size: 0.74rem;
       font-weight: 900;
-      padding: 5px 12px;
+      padding: 4px 12px;
       border-radius: 20px;
-      margin: 0 auto 3px auto;
-      cursor: pointer;
+      margin: 0 auto 2px auto;
       border: 2px solid var(--naranja);
       animation: parpadeoLlamativo 1s infinite alternate ease-in-out;
     }
@@ -169,11 +177,11 @@
         box-shadow: 0 0 3px rgba(243, 108, 33, 0.3);
       }
       100% {
-        transform: scale(1.04);
+        transform: scale(1.03);
         background-color: #ea580c;
         color: #ffffff;
         border-color: #ffffff;
-        box-shadow: 0 0 14px rgba(234, 88, 12, 0.85);
+        box-shadow: 0 0 12px rgba(234, 88, 12, 0.85);
       }
     }
 
@@ -203,42 +211,32 @@
     .votos-etiqueta { font-size: 0.62rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; }
     .subtotal-txt { font-size: 0.68rem; color: var(--texto-gris); }
 
-    /* CARA TRASERA */
-    .flip-card-back {
+    /* DORSO ARRIBA: CONCEJALES */
+    .flip-back-kegler {
       background: var(--blanco);
       border: 1.5px solid var(--verde-oscuro);
-      transform: rotateY(180deg);
       padding: 6px 8px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-
-    .back-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-    }
+    .back-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
     .back-header h2 { font-size: 0.74rem; font-weight: 800; color: var(--verde-oscuro); }
-    .btn-voltear-cerrar {
-      background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 12px;
-      font-size: 0.62rem; font-weight: 700; padding: 2px 7px; cursor: pointer; color: #475569;
-    }
+    .tag-temporizador { font-size: 0.58rem; background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 10px; font-weight: 700; }
 
-    .tabs-pag { display: flex; gap: 4px; margin-bottom: 4px; }
+    .tabs-pag { display: flex; gap: 4px; margin-bottom: 3px; }
     .tab-btn {
-      flex: 1; padding: 4px; border: 1px solid var(--verde-principal);
-      border-radius: 6px; font-size: 0.65rem; font-weight: 800;
+      flex: 1; padding: 3px; border: 1px solid var(--verde-principal);
+      border-radius: 6px; font-size: 0.62rem; font-weight: 800;
       background: #fff; color: var(--verde-oscuro); cursor: pointer;
     }
     .tab-btn.activa { background: var(--verde-principal); color: #fff; }
 
-    .back-lista { display: flex; flex-direction: column; gap: 3px; flex-grow: 1; justify-content: space-around; }
+    .back-lista { display: flex; flex-direction: column; gap: 2.5px; flex-grow: 1; justify-content: space-around; }
     .mini-row {
       display: flex; align-items: center; justify-content: space-between;
       padding: 3px 6px; border-radius: 6px; background: #f8fafc;
-      border-left: 3px solid #ccc; font-size: 0.68rem;
+      border-left: 3px solid #ccc; font-size: 0.66rem;
     }
     .mini-row.l1 { border-left-color: var(--rojo-anr); }
     .mini-row.l9 { border-left-color: var(--verde-principal); }
@@ -250,42 +248,78 @@
       border-left: 5px solid var(--naranja);
       background: #ecfdf5; font-weight: 800;
     }
-
     .pos-mini { font-weight: 800; color: var(--texto-gris); min-width: 18px; }
-    .nombre-mini { flex-grow: 1; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.68rem; }
-    .votos-mini { font-weight: 800; color: var(--texto-oscuro); min-width: 32px; text-align: right; font-size: 0.68rem; }
+    .nombre-mini { flex-grow: 1; padding: 0 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.66rem; }
+    .votos-mini { font-weight: 800; color: var(--texto-oscuro); min-width: 32px; text-align: right; }
 
-    /* Tarjeta Intendente */
-    .card-secundaria {
-      background: var(--blanco);
-      border-radius: 12px;
-      padding: 7px 10px;
-      border: 1px solid #e1e7e3;
+    /* --- TARJETA INFERIOR (INTENDENTE / BANCAS TRASERA) --- */
+    #tarjeta-inferior {
+      height: 125px;
       flex-shrink: 0;
     }
-    .seccion-titulo {
-      font-size: 0.7rem; font-weight: 800; color: var(--texto-gris);
-      text-transform: uppercase; margin-bottom: 4px; display: flex; justify-content: space-between;
-    }
 
+    .flip-front-int {
+      background: var(--blanco);
+      border-radius: 12px;
+      padding: 6px 10px;
+      border: 1px solid #e1e7e3;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .seccion-titulo {
+      font-size: 0.68rem; font-weight: 800; color: var(--texto-gris);
+      text-transform: uppercase; display: flex; justify-content: space-between;
+    }
     .fila-intendente {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 4px 8px; border-radius: 8px; margin-bottom: 3px; gap: 8px;
+      padding: 3px 6px; border-radius: 6px; gap: 8px;
     }
     .int-pen { background: #fffcf5; border-left: 4px solid var(--naranja); }
     .int-anr { background: #fff8f8; border-left: 4px solid var(--rojo-anr); }
 
     .int-candidato-flex { display: flex; align-items: center; gap: 8px; }
-    .foto-mini {
-      width: 28px; height: 28px; border-radius: 50%;
-      object-fit: cover; border: 1.5px solid #ddd; background: #fff;
-    }
+    .foto-mini { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; background: #fff; }
+    .int-info h4 { font-size: 0.72rem; font-weight: 800; line-height: 1.1; }
+    .int-info p { font-size: 0.58rem; color: var(--texto-gris); }
+    .int-res { text-align: right; min-width: 50px; }
+    .int-res strong { font-size: 0.88rem; display: block; line-height: 1.1; }
+    .int-res span { font-size: 0.62rem; font-weight: 700; color: var(--texto-gris); }
 
-    .int-info h4 { font-size: 0.76rem; font-weight: 800; line-height: 1.1; }
-    .int-info p { font-size: 0.62rem; color: var(--texto-gris); }
-    .int-res { text-align: right; min-width: 55px; }
-    .int-res strong { font-size: 0.92rem; display: block; line-height: 1.1; }
-    .int-res span { font-size: 0.65rem; font-weight: 700; color: var(--texto-gris); }
+    /* DORSO ABAJO: DISTRIBUCIÓN DE BANCAS D'HONDT */
+    .flip-back-bancas {
+      background: var(--blanco);
+      border-radius: 12px;
+      padding: 6px 8px;
+      border: 1.5px solid var(--naranja);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+    .banner-electo-mini {
+      background: #fff7ed;
+      border-radius: 6px;
+      padding: 4px;
+      border: 1px dashed var(--naranja);
+    }
+    .banner-electo-mini h3 { font-size: 0.74rem; color: var(--naranja); font-weight: 900; }
+    .banner-electo-mini p { font-size: 0.58rem; color: var(--texto-oscuro); margin-top: 1px; }
+
+    .bancas-grid-mini {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-top: 3px;
+    }
+    .banca-item-mini {
+      background: #f8fafc;
+      border-radius: 6px;
+      padding: 3px 2px;
+      border: 1px solid #e2e8f0;
+    }
+    .banca-item-mini span { font-size: 0.55rem; color: var(--texto-gris); font-weight: 700; display: block; }
+    .banca-item-mini strong { font-size: 0.95rem; line-height: 1; }
 
     /* Mesas */
     .mesas-grid {
@@ -308,12 +342,13 @@
 <body>
 
   <div class="container">
+    <!-- Header -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de Tiempo con Hora Oficial -->
+    <!-- Barra de Tiempo -->
     <div class="timer-container">
       <span id="hora-trep">
         <span class="live-dot">● En Vivo</span> | Corte: <span id="hora-valor">21:48:02</span>
@@ -326,13 +361,12 @@
       </div>
     </div>
 
-    <!-- BOX ANIMADO CON EFECTO 3D FLIP -->
-    <div class="flip-container" id="tarjeta-kegler" onclick="girarTarjeta()">
-      <div class="flip-card-inner">
+    <!-- TARJETA SUPERIOR CON FLIP (ARMANDO / CONCEJALES) -->
+    <div class="flip-box" id="tarjeta-kegler" onclick="dispararDobleGiro()">
+      <div class="flip-box-inner">
         
-        <!-- FRENTE: ARMANDO KEGLER -->
-        <div class="flip-card-front">
-          <!-- CARTEL GRANDE Y PARPADEANTE -->
+        <!-- FRENTE: ARMANDO -->
+        <div class="flip-front flip-front-kegler">
           <div class="globo-hint">
             <span>👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS 🔄</span>
           </div>
@@ -361,11 +395,11 @@
           </div>
         </div>
 
-        <!-- DORSO: LOS 12 CONCEJALES (EN 2 LISTAS DE 6) -->
-        <div class="flip-card-back">
+        <!-- DORSO: 12 CONCEJALES ELECTOS (EN 2 PÁGINAS DE 6) -->
+        <div class="flip-back flip-back-kegler">
           <div class="back-header">
             <h2>🏆 12 Concejales Electos (D'Hondt)</h2>
-            <button class="btn-voltear-cerrar" onclick="girarTarjeta(event)">↩ Volver</button>
+            <span class="tag-temporizador" id="segundos-restantes">Auto-regresa en 6s</span>
           </div>
 
           <div class="tabs-pag">
@@ -383,39 +417,73 @@
       </div>
     </div>
 
-    <!-- INTENDENTE: DATOS OFICIALES 21:48:02 -->
-    <div class="card-secundaria">
-      <div class="seccion-titulo">
-        <span>Intendente Municipal</span>
-        <span>Votos / %</span>
-      </div>
+    <!-- TARJETA INFERIOR CON FLIP (INTENDENTES / BANCAS D'HONDT) -->
+    <div class="flip-box" id="tarjeta-inferior" onclick="dispararDobleGiro()">
+      <div class="flip-box-inner">
+        
+        <!-- FRENTE: INTENDENTE -->
+        <div class="flip-front flip-front-int">
+          <div class="seccion-titulo">
+            <span>Intendente Municipal</span>
+            <span>Votos / %</span>
+          </div>
 
-      <div class="fila-intendente int-pen">
-        <div class="int-candidato-flex">
-          <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
-          <div class="int-info">
-            <h4>CONCEPCION MARTINEZ</h4>
-            <p>Lista 9 - PEN</p>
+          <div class="fila-intendente int-pen">
+            <div class="int-candidato-flex">
+              <img class="foto-mini" src="martinez.jpg" alt="Concepción Martínez" onerror="this.src='https://ui-avatars.com/api/?name=Concepcion+Martinez&background=f36c21&color=fff'">
+              <div class="int-info">
+                <h4>CONCEPCION MARTINEZ</h4>
+                <p>Lista 9 - PEN</p>
+              </div>
+            </div>
+            <div class="int-res">
+              <strong id="martinez-votos" style="color: var(--naranja);">6.919</strong>
+              <span id="martinez-porc">58.28%</span>
+            </div>
+          </div>
+
+          <div class="fila-intendente int-anr">
+            <div class="int-candidato-flex">
+              <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
+              <div class="int-info">
+                <h4>HERNAN RIVAS</h4>
+                <p>Lista 1 - ANR</p>
+              </div>
+            </div>
+            <div class="int-res">
+              <strong id="rivas-votos" style="color: var(--rojo-anr);">4.535</strong>
+              <span id="rivas-porc">38.20%</span>
+            </div>
           </div>
         </div>
-        <div class="int-res">
-          <strong id="martinez-votos" style="color: var(--naranja);">6.919</strong>
-          <span id="martinez-porc">58.28%</span>
-        </div>
-      </div>
 
-      <div class="fila-intendente int-anr">
-        <div class="int-candidato-flex">
-          <img class="foto-mini" src="rivas.jpg" alt="Hernán Rivas" onerror="this.src='https://ui-avatars.com/api/?name=Hernan+Rivas&background=d32f2f&color=fff'">
-          <div class="int-info">
-            <h4>HERNAN RIVAS</h4>
-            <p>Lista 1 - ANR</p>
+        <!-- DORSO: EL CUADRO DE BANCAS D'HONDT -->
+        <div class="flip-back flip-back-bancas">
+          <div class="banner-electo-mini">
+            <h3>🎉 ¡ARMANDO KEGLER ELECTO CONCEJAL!</h3>
+            <p>La Lista 9 aseguró <b>3 bancas</b> y Armando ingresa como el <b>3.° más votado</b> de su lista.</p>
+          </div>
+
+          <div class="bancas-grid-mini">
+            <div class="banca-item-mini" style="border-top: 2.5px solid var(--rojo-anr);">
+              <span>Lista 1 (ANR)</span>
+              <strong style="color: var(--rojo-anr);">7</strong>
+            </div>
+            <div class="banca-item-mini" style="border-top: 2.5px solid var(--verde-principal); background: #ecfdf5;">
+              <span>Lista 9 (TRP)</span>
+              <strong style="color: var(--verde-principal);">3</strong>
+            </div>
+            <div class="banca-item-mini" style="border-top: 2.5px solid var(--amarillo-l1000);">
+              <span>Lista 1000</span>
+              <strong style="color: var(--amarillo-l1000);">1</strong>
+            </div>
+            <div class="banca-item-mini" style="border-top: 2.5px solid var(--azul-l123);">
+              <span>Lista 123</span>
+              <strong style="color: var(--azul-l123);">1</strong>
+            </div>
           </div>
         </div>
-        <div class="int-res">
-          <strong id="rivas-votos" style="color: var(--rojo-anr);">4.535</strong>
-          <span id="rivas-porc">38.20%</span>
-        </div>
+
       </div>
     </div>
 
@@ -448,6 +516,7 @@
   </div>
 
   <script>
+    // LISTA OFICIAL D'HONDT
     const concejalesOficiales = [
       { pos: 1, nombre: "JUAN SAMIR AFARA", partido: "L1 - ANR", votos: 889, clase: "l1", esKegler: false },
       { pos: 2, nombre: "RAMON ANTONIO LOPEZ", partido: "L9 - TRP", votos: 691, clase: "l9", esKegler: false },
@@ -464,9 +533,56 @@
       { pos: 12, nombre: "ANDRES BENITEZ", partido: "L1 - ANR", votos: 451, clase: "l1", esKegler: false }
     ];
 
-    function girarTarjeta(e) {
-      if (e) e.stopPropagation();
-      document.getElementById('tarjeta-kegler').classList.toggle('girado');
+    // GIRO EN CASCADA CON REGRESO A LOS 6 SEGUNDOS
+    let giradoActivo = false;
+    let timerAutoRegreso = null;
+    let intervaloCuentaRegresiva = null;
+
+    function dispararDobleGiro() {
+      if (giradoActivo) {
+        regresarTodo();
+        return;
+      }
+
+      giradoActivo = true;
+
+      // 1. Giro Arriba
+      document.getElementById('tarjeta-kegler').classList.add('girado');
+
+      // 2. Giro Abajo con delay de 0.45s (Efecto cascada)
+      setTimeout(() => {
+        if (giradoActivo) {
+          document.getElementById('tarjeta-inferior').classList.add('girado');
+        }
+      }, 450);
+
+      let segRestantes = 6;
+      const tagSeg = document.getElementById('segundos-restantes');
+      tagSeg.innerText = `Auto-regresa en ${segRestantes}s`;
+
+      clearInterval(intervaloCuentaRegresiva);
+      intervaloCuentaRegresiva = setInterval(() => {
+        segRestantes--;
+        if (segRestantes > 0) {
+          tagSeg.innerText = `Auto-regresa en ${segRestantes}s`;
+        }
+      }, 1000);
+
+      clearTimeout(timerAutoRegreso);
+      timerAutoRegreso = setTimeout(() => {
+        regresarTodo();
+      }, 6000);
+    }
+
+    function regresarTodo() {
+      giradoActivo = false;
+      clearTimeout(timerAutoRegreso);
+      clearInterval(intervaloCuentaRegresiva);
+
+      document.getElementById('tarjeta-kegler').classList.remove('girado');
+      setTimeout(() => {
+        document.getElementById('tarjeta-inferior').classList.remove('girado');
+      }, 250);
     }
 
     function verPaginaConcejales(pag, e) {
@@ -484,8 +600,8 @@
         row.className = `mini-row ${c.clase} ${c.esKegler ? 'kegler-highlight' : ''}`;
         row.innerHTML = `
           <span class="pos-mini">#${c.pos}</span>
-          <span class="nombre-mini">${c.nombre} <b style="color:var(--texto-gris); font-size:0.6rem;">(${c.partido})</b></span>
-          <span class="votos-mini" style="${c.esKegler ? 'color: var(--naranja); font-size: 0.74rem;' : ''}">${c.votos}</span>
+          <span class="nombre-mini">${c.nombre} <b style="color:var(--texto-gris); font-size:0.58rem;">(${c.partido})</b></span>
+          <span class="votos-mini" style="${c.esKegler ? 'color: var(--naranja); font-size: 0.72rem;' : ''}">${c.votos}</span>
         `;
         cont.appendChild(row);
       });
@@ -493,6 +609,7 @@
 
     verPaginaConcejales(1);
 
+    // SISTEMA EN TIEMPO REAL
     let timer = 60;
 
     async function actualizarTREP() {
