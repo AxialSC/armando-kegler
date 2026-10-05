@@ -1,55 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const cheerio = require("cheerio");
 
 const app = express();
+
+const VERSION = "2.11.0";
+const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
+const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
+
 app.use(cors());
+app.use(express.json({ limit: "512kb" }));
 app.use(express.static(path.join(__dirname, "public")));
-
-const VERSION = "2.10.4";
-const POLL_MS = 60_000;
-const TREP_LANDING = "https://resultados.tsje.gov.py/publicacion/divulgacion.html";
-
-const URL_INTENDENTE =
-  "https://resultados.tsje.gov.py/publicacion/dinamics/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
-const URL_CONCEJALES =
-  "https://resultados.tsje.gov.py/publicacion/dinamics/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
-
-// Último dato confirmado conocido. Se usa solamente como respaldo y queda
-// explícitamente marcado como "stale" si TREP no puede ser leído.
-let estadoActual = {
-  ok: false,
-  version: VERSION,
-  source: "TREP / TSJE Paraguay",
-  status: "STARTING",
-  stale: true,
-  servidorHora: null,
-  ultimaConsulta: null,
-  ultimoCambio: null,
-  error: null,
-  mesas: {
-    total: 71,
-    procesadas: 71,
-    porcentaje: "100.00%",
-    totalVotos: 11871
-  },
-  intendente: {
-    lista9: { nombre: "CONCEPCION MARTINEZ", votos: 6919, porcentaje: "58.28%" },
-    lista1: { nombre: "HERNAN RIVAS", votos: 4535, porcentaje: "38.20%" }
-  },
-  concejal: {
-    armandoKegler: {
-      nombre: "ARMANDO KEGLER SAUCEDO",
-      orden: 4,
-      votosPreferenciales: 328,
-      totalLista9Concejales: 3840
-    }
-  }
-};
-
-let firmaUltimosDatos = null;
-let consultaEnCurso = false;
 
 function horaParaguay(date = new Date()) {
   return new Intl.DateTimeFormat("es-PY", {
@@ -64,256 +25,316 @@ function horaParaguay(date = new Date()) {
   }).format(date);
 }
 
-function numero(texto) {
-  if (texto == null) return null;
-  const limpio = String(texto).replace(/\./g, "").replace(/[^\d-]/g, "");
-  if (!limpio || limpio === "-") return null;
-  const n = Number(limpio);
-  return Number.isFinite(n) ? n : null;
+function normalizar(s) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase()
+    .trim();
 }
 
-function porcentaje(texto) {
-  const m = String(texto || "").match(/(\d{1,3}(?:[.,]\d+)?)\s*%/);
-  return m ? m[1].replace(",", ".") + "%" : null;
+function buscarCandidato(data, partes) {
+  const candidatos = Array.isArray(data?.candidatos) ? data.candidatos : [];
+  return candidatos.find(c =>
+    partes.every(p => normalizar(c?.nomCandidato).includes(p))
+  );
 }
 
-function textoPlano(html) {
-  const $ = cheerio.load(html);
-  $("script,style,noscript").remove();
-  return $.text().replace(/\u00a0/g, " ").replace(/[ \t]+/g, " ").replace(/\n+/g, "\n").trim();
+function porcentaje(votos, total) {
+  if (!Number.isFinite(votos) || !Number.isFinite(total) || total <= 0) return null;
+  return ((votos / total) * 100).toFixed(2) + "%";
 }
 
-function extraerNumeroCercano(texto, nombre, max = 180) {
-  const upper = texto.toUpperCase();
-  const pos = upper.indexOf(nombre.toUpperCase());
-  if (pos < 0) return null;
-  const zona = texto.slice(pos, pos + max);
-  const nums = [...zona.matchAll(/\b\d{1,3}(?:\.\d{3})+\b|\b\d{2,6}\b/g)]
-    .map(m => numero(m[0]))
-    .filter(n => Number.isFinite(n));
-  return nums.length ? nums[0] : null;
+function esEnteroNoNegativo(v) {
+  return Number.isInteger(v) && v >= 0;
 }
 
-function extraerPorcentajeCercano(texto, nombre, max = 220) {
-  const upper = texto.toUpperCase();
-  const pos = upper.indexOf(nombre.toUpperCase());
-  if (pos < 0) return null;
-  return porcentaje(texto.slice(pos, pos + max));
-}
-
-function extraerMesas(texto) {
-  const patrones = [
-    /MESAS\s+(?:PROCESADAS|COMPUTADAS|TRANSMITIDAS)[^\d]{0,30}(\d+)\s*(?:\/|DE)\s*(\d+)/i,
-    /(\d+)\s*(?:\/|DE)\s*(\d+)[^\n]{0,40}MESAS/i
-  ];
-  for (const re of patrones) {
-    const m = texto.match(re);
-    if (m) {
-      const procesadas = Number(m[1]);
-      const total = Number(m[2]);
-      return {
-        procesadas,
-        total,
-        porcentaje: total ? ((procesadas / total) * 100).toFixed(2) + "%" : null
-      };
+// Último dato conocido. Nunca se presenta como LIVE al iniciar.
+let estadoActual = {
+  ok: false,
+  version: VERSION,
+  source: "COLECTOR_TREP",
+  status: "STARTING",
+  stale: true,
+  servidorHora: null,
+  ultimaConsulta: null,
+  ultimaRecepcion: null,
+  ultimoCambio: null,
+  edadSegundos: null,
+  error: COLLECTOR_TOKEN
+    ? "Esperando primera transmisión del colector"
+    : "Falta configurar COLLECTOR_TOKEN en Render",
+  mesas: {
+    total: 71,
+    procesadas: 71,
+    porcentaje: "100.00%",
+    totalVotos: 11871
+  },
+  intendente: {
+    lista9: {
+      nombre: "CONCEPCION MARTINEZ",
+      votos: 6919,
+      porcentaje: "58.28%"
+    },
+    lista1: {
+      nombre: "HERNAN RIVAS",
+      votos: 4535,
+      porcentaje: "38.20%"
+    }
+  },
+  concejal: {
+    armandoKegler: {
+      nombre: "ARMANDO KEGLER SAUCEDO",
+      orden: 4,
+      votosPreferenciales: 328,
+      totalLista9Concejales: 3840
     }
   }
-  return null;
-}
+};
 
-let trepCookie = "";
+let firmaUltimosDatos = null;
+let ultimaRecepcionMs = null;
 
-function capturarCookies(headers) {
-  let raw = [];
-  if (typeof headers.getSetCookie === "function") raw = headers.getSetCookie();
-  else {
-    const one = headers.get("set-cookie");
-    if (one) raw = [one];
+function parsearCarga(body) {
+  const intData = body?.intendente;
+  const conData = body?.concejales;
+
+  if (!intData || !conData) {
+    throw new Error("La carga debe incluir 'intendente' y 'concejales'");
   }
-  if (!raw.length) return;
-  const jar = new Map();
-  if (trepCookie) {
-    trepCookie.split(";").forEach(par => {
-      const [k, ...v] = par.trim().split("=");
-      if (k) jar.set(k, v.join("="));
-    });
+
+  const martinez = buscarCandidato(intData, ["CONCEPCION", "MARTINEZ"]);
+  const rivas = buscarCandidato(intData, ["HERNAN", "RIVAS"]);
+  const kegler = buscarCandidato(conData, ["ARMANDO", "KEGLER"]);
+
+  if (!martinez || !rivas || !kegler) {
+    throw new Error("Faltan candidatos esperados en los datos recibidos");
   }
-  raw.forEach(line => {
-    const par = line.split(";")[0];
-    const [k, ...v] = par.split("=");
-    if (k) jar.set(k.trim(), v.join("="));
-  });
-  trepCookie = [...jar].map(([k,v]) => `${k}=${v}`).join("; ");
-}
 
-async function abrirSesionTREP() {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15_000);
-  try {
-    const res = await fetch(TREP_LANDING, {
-      signal: controller.signal,
-      redirect: "follow",
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "es-AR,es;q=0.9,en;q=0.6",
-        "Cache-Control": "no-cache"
-      }
-    });
-    capturarCookies(res.headers);
-    console.log(`[${VERSION}] DIAG landing status=${res.status} cookie=${trepCookie ? "SI" : "NO"}`);
-    if (!res.ok) throw new Error(`TREP landing respondió HTTP ${res.status}`);
-    await res.text();
-  } finally {
-    clearTimeout(timeout);
+  const vm = Number(martinez.votos);
+  const vr = Number(rivas.votos);
+  const vk = Number(kegler.votos);
+
+  const totales = intData.totales || {};
+  const totalVotos = Number(totales.totalVotos);
+  const totalMesas = Number(totales.totalMesas);
+  const mesasPublicadas = Number(totales.mesasPublicadas);
+
+  if (![vm, vr, vk].every(esEnteroNoNegativo)) {
+    throw new Error("Los votos recibidos no son válidos");
   }
-}
+  if (!esEnteroNoNegativo(totalVotos) ||
+      !esEnteroNoNegativo(totalMesas) ||
+      !esEnteroNoNegativo(mesasPublicadas) ||
+      mesasPublicadas > totalMesas) {
+    throw new Error("Los totales/mesas recibidos no son válidos");
+  }
 
-async function descargarJSON(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15_000);
-  try {
-    const res = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154.0.0.0 Safari/537.36",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Accept-Language": "es-AR,es;q=0.9,en;q=0.6",
-        "Referer": TREP_LANDING,
-        "X-Requested-With": "XMLHttpRequest",
-        "Cache-Control": "no-cache",
-        ...(trepCookie ? { "Cookie": trepCookie } : {})
-      }
-    });
-    capturarCookies(res.headers);
-    console.log(`[${VERSION}] DIAG ajax status=${res.status} cookie=${trepCookie ? "SI" : "NO"} url=${new URL(url).search}`);
-    if (!res.ok) throw new Error(`TREP AJAX respondió HTTP ${res.status}`);
-    const txt = await res.text();
-    try { return JSON.parse(txt); }
-    catch { throw new Error("TREP respondió, pero no devolvió JSON válido"); }
-  } finally { clearTimeout(timeout); }
-}
-
-function normalizar(s) {
-  return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-}
-function buscar(data, partes) {
-  const arr = Array.isArray(data?.candidatos) ? data.candidatos : [];
-  return arr.find(c => partes.every(p => normalizar(c.nomCandidato).includes(p)));
-}
-function pct(v,total) {
-  return Number.isFinite(v) && Number.isFinite(total) && total > 0
-    ? ((v/total)*100).toFixed(2)+"%" : null;
-}
-function parsearTREP(intData, conData) {
-  const martinez=buscar(intData,["CONCEPCION","MARTINEZ"]);
-  const rivas=buscar(intData,["HERNAN","RIVAS"]);
-  const kegler=buscar(conData,["ARMANDO","KEGLER"]);
-  if(!martinez||!rivas||!kegler) throw new Error("JSON recibido, pero faltan candidatos esperados");
-  const vm=Number(martinez.votos), vr=Number(rivas.votos), vk=Number(kegler.votos);
-  if(![vm,vr,vk].every(Number.isFinite)) throw new Error("JSON recibido, pero faltan votos");
-  const t=intData.totales||{};
-  const total=Number(t.totalVotos), tm=Number(t.totalMesas), mp=Number(t.mesasPublicadas);
   return {
-    servidorHora: intData.horaFormateada || horaParaguay(),
-    mesas:{
-      total:Number.isFinite(tm)?tm:estadoActual.mesas.total,
-      procesadas:Number.isFinite(mp)?mp:estadoActual.mesas.procesadas,
-      porcentaje:Number.isFinite(tm)&&tm>0&&Number.isFinite(mp)?((mp/tm)*100).toFixed(2)+"%":estadoActual.mesas.porcentaje,
-      totalVotos:Number.isFinite(total)?total:estadoActual.mesas.totalVotos
+    corteOficial:
+      intData.horaFormateada ||
+      conData.horaFormateada ||
+      null,
+    mesas: {
+      total: totalMesas,
+      procesadas: mesasPublicadas,
+      porcentaje: totalMesas > 0
+        ? ((mesasPublicadas / totalMesas) * 100).toFixed(2) + "%"
+        : "0.00%",
+      totalVotos
     },
-    intendente:{
-      lista9:{nombre:"CONCEPCION MARTINEZ",votos:vm,porcentaje:pct(vm,total)||estadoActual.intendente.lista9.porcentaje},
-      lista1:{nombre:"HERNAN RIVAS",votos:vr,porcentaje:pct(vr,total)||estadoActual.intendente.lista1.porcentaje}
+    intendente: {
+      lista9: {
+        nombre: "CONCEPCION MARTINEZ",
+        votos: vm,
+        porcentaje: porcentaje(vm, totalVotos)
+      },
+      lista1: {
+        nombre: "HERNAN RIVAS",
+        votos: vr,
+        porcentaje: porcentaje(vr, totalVotos)
+      }
     },
-    concejal:{armandoKegler:{
-      nombre:"ARMANDO KEGLER SAUCEDO",orden:4,votosPreferenciales:vk,
-      totalLista9Concejales:estadoActual.concejal.armandoKegler.totalLista9Concejales
-    }}
+    concejal: {
+      armandoKegler: {
+        nombre: "ARMANDO KEGLER SAUCEDO",
+        orden: 4,
+        votosPreferenciales: vk,
+        // Se conserva hasta que definamos qué campo oficial representa
+        // inequívocamente el total de la Lista 9 para concejales.
+        totalLista9Concejales:
+          estadoActual.concejal.armandoKegler.totalLista9Concejales
+      }
+    }
   };
 }
 
-async function consultarTREP() {
-  if (consultaEnCurso) return;
-  consultaEnCurso = true;
-  const ahora = new Date();
+function tokenValido(req) {
+  const bearer = String(req.get("authorization") || "");
+  const headerToken = String(req.get("x-collector-token") || "");
+  const token = bearer.startsWith("Bearer ")
+    ? bearer.slice(7).trim()
+    : headerToken.trim();
+
+  return Boolean(COLLECTOR_TOKEN) && token === COLLECTOR_TOKEN;
+}
+
+function actualizarEstadoTemporal() {
+  if (!ultimaRecepcionMs) {
+    estadoActual.status = "STALE";
+    estadoActual.stale = true;
+    estadoActual.edadSegundos = null;
+    return;
+  }
+
+  const edad = Date.now() - ultimaRecepcionMs;
+  estadoActual.edadSegundos = Math.floor(edad / 1000);
+
+  if (edad <= LIVE_MS) {
+    estadoActual.status = "LIVE";
+    estadoActual.stale = false;
+    estadoActual.ok = true;
+  } else {
+    estadoActual.status = "STALE";
+    estadoActual.stale = true;
+    estadoActual.ok = false;
+    estadoActual.error =
+      `Sin transmisión del colector desde hace ${estadoActual.edadSegundos} segundos`;
+  }
+}
+
+app.post("/api/colector", (req, res) => {
+  res.set("Cache-Control", "no-store");
+
+  if (!COLLECTOR_TOKEN) {
+    return res.status(503).json({
+      ok: false,
+      version: VERSION,
+      error: "COLLECTOR_TOKEN no está configurado en Render"
+    });
+  }
+
+  if (!tokenValido(req)) {
+    console.warn(`[${VERSION}] COLECTOR rechazado: token inválido`);
+    return res.status(401).json({
+      ok: false,
+      error: "No autorizado"
+    });
+  }
 
   try {
-    trepCookie = "";
-    await abrirSesionTREP();
-
-    const [intData, conData] = await Promise.all([
-      descargarJSON(URL_INTENDENTE),
-      descargarJSON(URL_CONCEJALES)
-    ]);
-
-    const datos = parsearTREP(intData, conData);
-    const firma = JSON.stringify(datos);
+    const datos = parsearCarga(req.body);
+    const ahora = new Date();
+    const firma = JSON.stringify({
+      mesas: datos.mesas,
+      intendente: datos.intendente,
+      concejal: datos.concejal,
+      corteOficial: datos.corteOficial
+    });
 
     if (firma !== firmaUltimosDatos) {
       estadoActual.ultimoCambio = horaParaguay(ahora);
       firmaUltimosDatos = firma;
     }
 
+    ultimaRecepcionMs = Date.now();
+
     estadoActual = {
       ...estadoActual,
       ...datos,
       ok: true,
       version: VERSION,
-      source: "TREP / TSJE Paraguay · JSON oficial",
+      source: "COLECTOR_TREP · TSJE Paraguay",
       status: "LIVE",
       stale: false,
       servidorHora: horaParaguay(ahora),
       ultimaConsulta: horaParaguay(ahora),
+      ultimaRecepcion: horaParaguay(ahora),
+      edadSegundos: 0,
       error: null
     };
 
-    console.log(`[${VERSION}] TREP OK - ${estadoActual.ultimaConsulta}`);
+    console.log(
+      `[${VERSION}] COLECTOR OK | corte=${datos.corteOficial || "--"} ` +
+      `| mesas=${datos.mesas.procesadas}/${datos.mesas.total} ` +
+      `| Martinez=${datos.intendente.lista9.votos} ` +
+      `| Rivas=${datos.intendente.lista1.votos} ` +
+      `| Kegler=${datos.concejal.armandoKegler.votosPreferenciales}`
+    );
+
+    return res.json({
+      ok: true,
+      version: VERSION,
+      status: "LIVE",
+      recibido: estadoActual.ultimaRecepcion,
+      corteOficial: datos.corteOficial
+    });
   } catch (err) {
-    estadoActual = {
-      ...estadoActual,
+    console.error(`[${VERSION}] COLECTOR ERROR: ${err.message}`);
+    return res.status(400).json({
       ok: false,
       version: VERSION,
-      status: "STALE",
-      stale: true,
-      ultimaConsulta: horaParaguay(ahora),
-      error: err?.message || "Error desconocido consultando TREP"
-    };
-    console.error(`[${VERSION}] TREP ERROR - ${estadoActual.ultimaConsulta}: ${estadoActual.error}`);
-  } finally {
-    consultaEnCurso = false;
+      error: err.message
+    });
   }
-}
+});
 
 app.get("/api/resultados", (req, res) => {
+  actualizarEstadoTemporal();
   res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.json({
     ...estadoActual,
-    proximaConsultaSegundos: Math.ceil(POLL_MS / 1000)
+    proximaConsultaSegundos: 60
   });
 });
 
 app.get("/api/health", (req, res) => {
+  actualizarEstadoTemporal();
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.json({
     service: "TREP Monitor Armando Kegler",
     version: VERSION,
+    source: estadoActual.source,
     status: estadoActual.status,
-    ultimaConsulta: estadoActual.ultimaConsulta,
-    ultimoCambio: estadoActual.ultimoCambio,
     stale: estadoActual.stale,
+    collectorConfigured: Boolean(COLLECTOR_TOKEN),
+    ultimaRecepcion: estadoActual.ultimaRecepcion,
+    edadSegundos: estadoActual.edadSegundos,
+    ultimoCambio: estadoActual.ultimoCambio,
+    corteOficial: estadoActual.corteOficial || null,
     error: estadoActual.error
   });
 });
 
-app.get("/api/forzar-actualizacion", async (req, res) => {
-  await consultarTREP();
-  res.json(estadoActual);
+// Se conserva para que el botón existente del frontend no falle.
+// En v2.11.0 ya no intenta consultar directamente al TSJE desde Render.
+app.get("/api/forzar-actualizacion", (req, res) => {
+  actualizarEstadoTemporal();
+  res.set("Cache-Control", "no-store");
+  res.json({
+    ...estadoActual,
+    mensaje: "La actualización llega desde el colector TREP"
+  });
+});
+
+app.get("/api/colector/status", (req, res) => {
+  actualizarEstadoTemporal();
+  res.set("Cache-Control", "no-store");
+  res.json({
+    version: VERSION,
+    configured: Boolean(COLLECTOR_TOKEN),
+    status: estadoActual.status,
+    ultimaRecepcion: estadoActual.ultimaRecepcion,
+    edadSegundos: estadoActual.edadSegundos,
+    corteOficial: estadoActual.corteOficial || null
+  });
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`TREP Monitor v${VERSION} activo en puerto ${PORT}`);
-  consultarTREP();
-  setInterval(consultarTREP, POLL_MS);
+  console.log(
+    `[${VERSION}] MODO COLECTOR | token=${COLLECTOR_TOKEN ? "CONFIGURADO" : "FALTA CONFIGURAR"}`
+  );
 });
