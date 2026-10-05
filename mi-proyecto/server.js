@@ -7,8 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
-const VERSION = "2.10.3";
+const VERSION = "2.10.4";
 const POLL_MS = 60_000;
+const TREP_LANDING = "https://resultados.tsje.gov.py/publicacion/divulgacion.html";
 
 const URL_INTENDENTE =
   "https://resultados.tsje.gov.py/publicacion/dinamics/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
@@ -120,6 +121,54 @@ function extraerMesas(texto) {
   return null;
 }
 
+let trepCookie = "";
+
+function capturarCookies(headers) {
+  let raw = [];
+  if (typeof headers.getSetCookie === "function") raw = headers.getSetCookie();
+  else {
+    const one = headers.get("set-cookie");
+    if (one) raw = [one];
+  }
+  if (!raw.length) return;
+  const jar = new Map();
+  if (trepCookie) {
+    trepCookie.split(";").forEach(par => {
+      const [k, ...v] = par.trim().split("=");
+      if (k) jar.set(k, v.join("="));
+    });
+  }
+  raw.forEach(line => {
+    const par = line.split(";")[0];
+    const [k, ...v] = par.split("=");
+    if (k) jar.set(k.trim(), v.join("="));
+  });
+  trepCookie = [...jar].map(([k,v]) => `${k}=${v}`).join("; ");
+}
+
+async function abrirSesionTREP() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15_000);
+  try {
+    const res = await fetch(TREP_LANDING, {
+      signal: controller.signal,
+      redirect: "follow",
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "es-AR,es;q=0.9,en;q=0.6",
+        "Cache-Control": "no-cache"
+      }
+    });
+    capturarCookies(res.headers);
+    console.log(`[${VERSION}] DIAG landing status=${res.status} cookie=${trepCookie ? "SI" : "NO"}`);
+    if (!res.ok) throw new Error(`TREP landing respondió HTTP ${res.status}`);
+    await res.text();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 async function descargarJSON(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
@@ -130,12 +179,15 @@ async function descargarJSON(url) {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154.0.0.0 Safari/537.36",
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "Accept-Language": "es-AR,es;q=0.9,en;q=0.6",
-        "Referer": "https://resultados.tsje.gov.py/publicacion/divulgacion.html",
+        "Referer": TREP_LANDING,
         "X-Requested-With": "XMLHttpRequest",
-        "Cache-Control": "no-cache"
+        "Cache-Control": "no-cache",
+        ...(trepCookie ? { "Cookie": trepCookie } : {})
       }
     });
-    if (!res.ok) throw new Error(`TREP respondió HTTP ${res.status}`);
+    capturarCookies(res.headers);
+    console.log(`[${VERSION}] DIAG ajax status=${res.status} cookie=${trepCookie ? "SI" : "NO"} url=${new URL(url).search}`);
+    if (!res.ok) throw new Error(`TREP AJAX respondió HTTP ${res.status}`);
     const txt = await res.text();
     try { return JSON.parse(txt); }
     catch { throw new Error("TREP respondió, pero no devolvió JSON válido"); }
@@ -187,6 +239,9 @@ async function consultarTREP() {
   const ahora = new Date();
 
   try {
+    trepCookie = "";
+    await abrirSesionTREP();
+
     const [intData, conData] = await Promise.all([
       descargarJSON(URL_INTENDENTE),
       descargarJSON(URL_CONCEJALES)
