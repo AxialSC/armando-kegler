@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>TREP en Vivo - Armando Kegler</title>
 
-  <!-- METADATOS PARA WHATSAPP: USA EL BANNER LOGO.JPG -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
   <meta property="og:description" content="Conteo oficial en tiempo real - Tomás Romero Pereira">
@@ -68,7 +67,6 @@
     .header h1 { font-size: 0.92rem; font-weight: 800; text-transform: uppercase; }
     .header p { font-size: 0.65rem; opacity: 0.9; }
 
-    /* Barra del Reloj y Hora Oficial */
     .timer-container {
       display: flex;
       justify-content: space-between;
@@ -242,16 +240,15 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de tiempo con Punto Verde + Hora Oficial TREP -->
+    <!-- Barra de tiempo: Hora fija en 21:16:03 -->
     <div class="timer-container">
       <span id="hora-trep">
-        <span class="live-dot">● En Vivo</span> | 21:16:03
+        <span class="live-dot">● En Vivo</span> | <span id="hora-valor">21:16:03</span>
       </span>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span class="timer-badge" id="countdown">60s</span>
@@ -261,7 +258,7 @@
       </div>
     </div>
 
-    <!-- ARMANDO KEGLER -->
+    <!-- Armando Kegler -->
     <div class="card-kegler">
       <div class="kegler-top-row">
         <div class="foto-kegler-container">
@@ -286,7 +283,7 @@
       </div>
     </div>
 
-    <!-- INTENDENTE -->
+    <!-- Intendente -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
@@ -322,7 +319,7 @@
       </div>
     </div>
 
-    <!-- MESAS: Actualizado al 100% de la última captura -->
+    <!-- Mesas: 100% -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
@@ -338,7 +335,7 @@
       </div>
     </div>
 
-    <!-- PIE AXIAL SECURITY -->
+    <!-- Pie Axial Security -->
     <div class="footer-axial">
       <span>Designed & Developed by</span>
       <a href="https://wa.me/5491164148500?text=Hola%20Iv%C3%A1n%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20votaci%C3%B3n%20en%20vivo%20de%20Tom%C3%A1s%20Romero%20Pereira.%20%C2%BFMe%20podr%C3%ADas%20contactar%3F" target="_blank" rel="noopener noreferrer">
@@ -390,12 +387,16 @@
           document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
         }
 
-        // Hora exacta publicada por el TREP
+        // Hora exacta y fija (nunca más 'Vivo')
         if (data.servidorHora) {
-          const partes = data.servidorHora.split(' ');
-          const soloHora = partes[1] || data.servidorHora;
-          document.getElementById('hora-trep').innerHTML = 
-            `<span class="live-dot">● En Vivo</span> | ${soloHora}`;
+          let horaLimpia = data.servidorHora;
+          if (data.servidorHora.includes(' ')) {
+            const partes = data.servidorHora.trim().split(/\s+/);
+            horaLimpia = partes[1] || partes[0];
+          }
+          if (horaLimpia !== "Vivo" && horaLimpia !== "En Vivo") {
+            document.getElementById('hora-valor').innerText = horaLimpia;
+          }
         }
       } catch (e) {}
     }
