@@ -9,10 +9,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 const URL_INTENDENTE = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
 const URL_CONCEJALES = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
 
-// Corte oficial definitivo: 71 de 71 mesas (100%) a las 21:16:03
+// Corte oficial de las 21:48:02
 let estadoActual = {
   ok: true,
-  servidorHora: "04-10-2026 21:16:03",
+  servidorHora: "04-10-2026 21:48:02",
   mesas: {
     total: 71,
     procesadas: 71,
@@ -20,8 +20,8 @@ let estadoActual = {
     totalVotos: 11871
   },
   intendente: {
-    lista9: { nombre: "CONCEPCION MARTINEZ", votos: 6407, porcentaje: "58.56%" },
-    lista1: { nombre: "HERNAN RIVAS", votos: 4152, porcentaje: "37.95%" }
+    lista9: { nombre: "CONCEPCION MARTINEZ", votos: 6919, porcentaje: "58.28%" },
+    lista1: { nombre: "HERNAN RIVAS", votos: 4535, porcentaje: "38.20%" }
   },
   concejal: {
     armandoKegler: {
@@ -33,77 +33,54 @@ let estadoActual = {
   }
 };
 
-async function consultarTSJEConReintento(url, intentos = 3) {
+async function consultarTSJE(url) {
   const headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Accept': 'application/json, text/javascript, */*; q=0.01',
     'Referer': 'https://resultados.tsje.gov.py/publicacion/divulgacion.html',
     'X-Requested-With': 'XMLHttpRequest'
   };
-
-  for (let i = 0; i < intentos; i++) {
-    try {
-      const res = await fetch(`${url}&_=${Date.now()}`, { headers });
-      if (res.ok) return await res.json();
-    } catch (e) {
-      await new Promise(r => setTimeout(r, 600));
-    }
-  }
+  try {
+    const res = await fetch(`${url}&_=${Date.now()}`, { headers });
+    if (res.ok) return await res.json();
+  } catch (e) {}
   return null;
 }
 
 app.get('/api/resultados', async (req, res) => {
-  const [dataIntendente, dataConcejal] = await Promise.all([
-    consultarTSJEConReintento(URL_INTENDENTE),
-    consultarTSJEConReintento(URL_CONCEJALES)
+  const [dataInt, dataConc] = await Promise.all([
+    consultarTSJE(URL_INTENDENTE),
+    consultarTSJE(URL_CONCEJALES)
   ]);
 
-  // Actualizar concejales si hay nueva respuesta
-  if (dataConcejal && dataConcejal.candidatos) {
-    const l9Conc = dataConcejal.candidatos.find(c => c.numLista === "9" || c.numLista == 9);
-    if (l9Conc && Array.isArray(l9Conc.candidatosPref)) {
-      const kegler = l9Conc.candidatosPref.find(p => 
-        (p.nomCandidato && p.nomCandidato.toUpperCase().includes("KEGLER")) || p.orden === 4 || p.orden === "4"
-      );
-      if (kegler && (kegler.votos || kegler.pref)) {
-        estadoActual.concejal.armandoKegler.votosPreferenciales = Number(kegler.votos || kegler.pref);
-      }
-      if (l9Conc.votos) {
-        estadoActual.concejal.armandoKegler.totalLista9Concejales = Number(l9Conc.votos);
-      }
-    }
-    if (dataConcejal.horaFormated) {
-      estadoActual.servidorHora = dataConcejal.horaFormated;
-    }
-  }
-
-  // Actualizar intendente si hay nueva respuesta
-  if (dataIntendente && dataIntendente.candidatos) {
-    const l1 = dataIntendente.candidatos.find(c => c.numLista === "1" || c.numLista == 1);
-    const l9 = dataIntendente.candidatos.find(c => c.numLista === "9" || c.numLista == 9);
-    const tot = dataIntendente.totales?.totalVotos || estadoActual.mesas.totalVotos;
-
-    if (l1 && l1.votos) {
+  if (dataInt && dataInt.candidatos) {
+    const l1 = dataInt.candidatos.find(c => c.numLista == 1);
+    const l9 = dataInt.candidatos.find(c => c.numLista == 9);
+    const tot = dataInt.totales?.totalVotos || 11871;
+    if (l1?.votos) {
       estadoActual.intendente.lista1.votos = Number(l1.votos);
       estadoActual.intendente.lista1.porcentaje = ((l1.votos / tot) * 100).toFixed(2) + "%";
     }
-    if (l9 && l9.votos) {
+    if (l9?.votos) {
       estadoActual.intendente.lista9.votos = Number(l9.votos);
       estadoActual.intendente.lista9.porcentaje = ((l9.votos / tot) * 100).toFixed(2) + "%";
     }
-    if (dataIntendente.totales) {
-      estadoActual.mesas.procesadas = dataIntendente.totales.mesasPublicadas || estadoActual.mesas.procesadas;
-      estadoActual.mesas.total = dataIntendente.totales.totalMesas || estadoActual.mesas.total;
-      estadoActual.mesas.porcentaje = ((estadoActual.mesas.procesadas / estadoActual.mesas.total) * 100).toFixed(2) + "%";
-      estadoActual.mesas.totalVotos = dataIntendente.totales.totalVotos || estadoActual.mesas.totalVotos;
+    if (dataInt.horaFormated) estadoActual.servidorHora = dataInt.horaFormated;
+  }
+
+  if (dataConc && dataConc.candidatos) {
+    const l9c = dataConc.candidatos.find(c => c.numLista == 9);
+    if (l9c?.candidatosPref) {
+      const keg = l9c.candidatosPref.find(p => (p.nomCandidato && p.nomCandidato.includes("KEGLER")) || p.orden == 4);
+      if (keg?.votos || keg?.pref) {
+        estadoActual.concejal.armandoKegler.votosPreferenciales = Number(keg.votos || keg.pref);
+      }
     }
-    if (dataIntendente.horaFormated) {
-      estadoActual.servidorHora = dataIntendente.horaFormated;
-    }
+    if (dataConc.horaFormated) estadoActual.servidorHora = dataConc.horaFormated;
   }
 
   res.json(estadoActual);
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor activo en puerto ${PORT}`));
+app.listen(PORT, () => console.log(`Servidor activo en ${PORT}`));

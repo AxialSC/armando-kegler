@@ -12,8 +12,6 @@
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://armando-kegler.onrender.com">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://armando-kegler.onrender.com/logo.jpg">
 
   <style>
     :root {
@@ -230,11 +228,7 @@
       gap: 4px;
       font-weight: 600;
     }
-    .wa-icon {
-      width: 12px;
-      height: 12px;
-      fill: #25d366;
-    }
+    .wa-icon { width: 12px; height: 12px; fill: #25d366; }
   </style>
 </head>
 <body>
@@ -245,10 +239,10 @@
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
-    <!-- Barra de tiempo: Hora fija en 21:16:03 -->
+    <!-- Barra de tiempo con corte oficial de 21:48:02 -->
     <div class="timer-container">
       <span id="hora-trep">
-        <span class="live-dot">● En Vivo</span> | <span id="hora-valor">21:16:03</span>
+        <span class="live-dot">● En Vivo</span> | <span id="hora-valor">21:48:02</span>
       </span>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span class="timer-badge" id="countdown">60s</span>
@@ -258,7 +252,7 @@
       </div>
     </div>
 
-    <!-- Armando Kegler -->
+    <!-- ARMANDO KEGLER -->
     <div class="card-kegler">
       <div class="kegler-top-row">
         <div class="foto-kegler-container">
@@ -283,7 +277,7 @@
       </div>
     </div>
 
-    <!-- Intendente -->
+    <!-- INTENDENTE: 21:48:02 OFICIAL -->
     <div class="card-secundaria">
       <div class="seccion-titulo">
         <span>Intendente Municipal</span>
@@ -299,8 +293,8 @@
           </div>
         </div>
         <div class="int-res">
-          <strong id="martinez-votos" style="color: var(--naranja);">6.407</strong>
-          <span id="martinez-porc">58.56%</span>
+          <strong id="martinez-votos" style="color: var(--naranja);">6.919</strong>
+          <span id="martinez-porc">58.28%</span>
         </div>
       </div>
 
@@ -313,13 +307,13 @@
           </div>
         </div>
         <div class="int-res">
-          <strong id="rivas-votos" style="color: var(--rojo-anr);">4.152</strong>
-          <span id="rivas-porc">37.95%</span>
+          <strong id="rivas-votos" style="color: var(--rojo-anr);">4.535</strong>
+          <span id="rivas-porc">38.20%</span>
         </div>
       </div>
     </div>
 
-    <!-- Mesas: 100% -->
+    <!-- MESAS: 100% -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
@@ -335,7 +329,6 @@
       </div>
     </div>
 
-    <!-- Pie Axial Security -->
     <div class="footer-axial">
       <span>Designed & Developed by</span>
       <a href="https://wa.me/5491164148500?text=Hola%20Iv%C3%A1n%2C%20vengo%20de%20la%20p%C3%A1gina%20de%20votaci%C3%B3n%20en%20vivo%20de%20Tom%C3%A1s%20Romero%20Pereira.%20%C2%BFMe%20podr%C3%ADas%20contactar%3F" target="_blank" rel="noopener noreferrer">
@@ -350,53 +343,76 @@
   <script>
     let timer = 60;
 
+    function renderizar(data) {
+      if (!data) return;
+
+      if (data.concejal?.armandoKegler?.votosPreferenciales) {
+        document.getElementById('kegler-votos').innerText = 
+          Number(data.concejal.armandoKegler.votosPreferenciales).toLocaleString('es-PY');
+      }
+
+      if (data.intendente?.lista9?.votos) {
+        document.getElementById('martinez-votos').innerText = 
+          Number(data.intendente.lista9.votos).toLocaleString('es-PY');
+        document.getElementById('martinez-porc').innerText = data.intendente.lista9.porcentaje;
+      }
+
+      if (data.intendente?.lista1?.votos) {
+        document.getElementById('rivas-votos').innerText = 
+          Number(data.intendente.lista1.votos).toLocaleString('es-PY');
+        document.getElementById('rivas-porc').innerText = data.intendente.lista1.porcentaje;
+      }
+
+      if (data.mesas?.procesadas && data.mesas?.total) {
+        document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
+        document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
+        document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
+      }
+
+      if (data.servidorHora) {
+        let h = data.servidorHora;
+        if (h.includes(' ')) h = h.split(' ')[1];
+        if (h && h !== "Vivo" && h !== "En Vivo") {
+          document.getElementById('hora-valor').innerText = h;
+        }
+      }
+    }
+
     async function actualizarTREP() {
+      // 1. Intentar consulta local del celular vía proxy sin bloqueo
+      try {
+        const u = encodeURIComponent("https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53&_=" + Date.now());
+        const resDirect = await fetch("https://api.allorigins.win/raw?url=" + u);
+        if (resDirect.ok) {
+          const d = await resDirect.json();
+          if (d && d.candidatos) {
+            const l1 = d.candidatos.find(c => c.numLista == 1) || {};
+            const l9 = d.candidatos.find(c => c.numLista == 9) || {};
+            const tot = d.totales?.totalVotos || 11871;
+            renderizar({
+              servidorHora: d.horaFormated,
+              mesas: {
+                total: d.totales?.totalMesas || 71,
+                procesadas: d.totales?.mesasPublicadas || 71,
+                porcentaje: "100.00%",
+                totalVotos: tot
+              },
+              intendente: {
+                lista9: { votos: l9.votos, porcentaje: ((l9.votos / tot) * 100).toFixed(2) + "%" },
+                lista1: { votos: l1.votos, porcentaje: ((l1.votos / tot) * 100).toFixed(2) + "%" }
+              }
+            });
+            return;
+          }
+        }
+      } catch (e) {}
+
+      // 2. Consulta de respaldo al servidor Render
       try {
         const res = await fetch('/api/resultados');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data || !data.ok) return;
-
-        // Armando Kegler
-        if (data.concejal?.armandoKegler?.votosPreferenciales) {
-          document.getElementById('kegler-votos').innerText = 
-            Number(data.concejal.armandoKegler.votosPreferenciales).toLocaleString('es-PY');
-        }
-        if (data.concejal?.armandoKegler?.totalLista9Concejales) {
-          document.getElementById('lista9-total-concejal').innerText = 
-            Number(data.concejal.armandoKegler.totalLista9Concejales).toLocaleString('es-PY');
-        }
-
-        // Intendentes
-        if (data.intendente?.lista9?.votos) {
-          document.getElementById('martinez-votos').innerText = 
-            Number(data.intendente.lista9.votos).toLocaleString('es-PY');
-          document.getElementById('martinez-porc').innerText = data.intendente.lista9.porcentaje;
-        }
-
-        if (data.intendente?.lista1?.votos) {
-          document.getElementById('rivas-votos').innerText = 
-            Number(data.intendente.lista1.votos).toLocaleString('es-PY');
-          document.getElementById('rivas-porc').innerText = data.intendente.lista1.porcentaje;
-        }
-
-        // Mesas
-        if (data.mesas?.procesadas && data.mesas?.total) {
-          document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
-          document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
-          document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
-        }
-
-        // Hora exacta y fija (nunca más 'Vivo')
-        if (data.servidorHora) {
-          let horaLimpia = data.servidorHora;
-          if (data.servidorHora.includes(' ')) {
-            const partes = data.servidorHora.trim().split(/\s+/);
-            horaLimpia = partes[1] || partes[0];
-          }
-          if (horaLimpia !== "Vivo" && horaLimpia !== "En Vivo") {
-            document.getElementById('hora-valor').innerText = horaLimpia;
-          }
+        if (res.ok) {
+          const data = await res.json();
+          renderizar(data);
         }
       } catch (e) {}
     }

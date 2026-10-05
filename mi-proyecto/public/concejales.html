@@ -19,169 +19,101 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #f0f4f1; color: var(--texto-oscuro); padding: 10px; }
-    .container { max-width: 480px; margin: 0 auto; }
+    body { background-color: #f0f4f1; color: var(--texto-oscuro); padding: 8px 10px; }
+    .container { max-width: 440px; margin: 0 auto; min-height: 100dvh; display: flex; flex-direction: column; justify-content: space-between; }
 
-    /* Cabecera */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
-      color: var(--blanco);
-      padding: 12px 14px;
-      border-radius: 14px;
-      text-align: center;
-      margin-bottom: 10px;
-      position: relative;
+      color: var(--blanco); padding: 10px; border-radius: 12px;
+      text-align: center; margin-bottom: 8px; position: relative;
     }
-    .header::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--naranja); }
-    .header h1 { font-size: 1.05rem; font-weight: 800; text-transform: uppercase; }
-    .header p { font-size: 0.72rem; opacity: 0.9; margin-top: 2px; }
+    .header::after { content: ""; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: var(--naranja); }
+    .header h1 { font-size: 0.95rem; font-weight: 800; text-transform: uppercase; }
+    .header p { font-size: 0.68rem; opacity: 0.9; }
 
-    /* Resumen de Bancas */
-    .bancas-resumen {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      margin-bottom: 10px;
+    /* Paginador superior */
+    .paginador {
+      display: flex; gap: 8px; margin-bottom: 8px;
     }
-    .banca-card {
-      background: var(--blanco);
-      border-radius: 10px;
-      padding: 6px;
-      text-align: center;
-      border: 1px solid #dcdcdc;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    .btn-pag {
+      flex: 1; padding: 8px; border: 1.5px solid var(--verde-principal);
+      border-radius: 10px; background: var(--blanco); font-size: 0.75rem;
+      font-weight: 800; color: var(--verde-oscuro); cursor: pointer; text-align: center;
+      transition: all 0.2s;
     }
-    .banca-card span { font-size: 0.65rem; color: var(--texto-gris); font-weight: 700; display: block; }
-    .banca-card strong { font-size: 1.1rem; }
+    .btn-pag.activa {
+      background: var(--verde-principal); color: var(--blanco); box-shadow: 0 3px 6px rgba(0, 135, 61, 0.2);
+    }
 
-    /* Banner Armando Electo */
-    .banner-electo {
-      background: linear-gradient(135deg, #fff7ed, #ffedd5);
-      border: 2px solid var(--naranja);
-      border-radius: 12px;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 10px rgba(243, 108, 33, 0.15);
-    }
-    .banner-electo h2 { font-size: 0.95rem; color: var(--naranja); font-weight: 900; }
-    .banner-electo p { font-size: 0.75rem; color: var(--texto-oscuro); margin-top: 2px; }
-
-    /* Lista de los 12 Ganadores */
-    .lista-concejales { display: flex; flex-direction: column; gap: 6px; }
+    /* Lista */
+    .lista-concejales { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; }
 
     .concejal-row {
-      background: var(--blanco);
-      border-radius: 10px;
-      padding: 8px 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-left: 5px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+      background: var(--blanco); border-radius: 10px; padding: 7px 9px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-left: 5px solid #ccc; box-shadow: 0 2px 4px rgba(0,0,0,0.03);
     }
-
-    /* Distintivos por Partido */
     .concejal-row.l1 { border-left-color: var(--rojo-anr); }
     .concejal-row.l9 { border-left-color: var(--verde-principal); background: #fafffb; }
     .concejal-row.l1000 { border-left-color: var(--amarillo-l1000); }
     .concejal-row.l123 { border-left-color: var(--azul-l123); }
 
-    /* Destacado especial para Armando Kegler */
     .concejal-row.kegler-highlight {
       border: 2px solid var(--verde-principal);
       border-left: 6px solid var(--naranja);
       background: linear-gradient(to right, #f0fdf4, #ffffff);
-      box-shadow: 0 4px 12px rgba(0, 135, 61, 0.2);
+      box-shadow: 0 4px 10px rgba(0, 135, 61, 0.2);
     }
 
-    .posicion {
-      font-size: 0.9rem;
-      font-weight: 900;
-      color: var(--texto-gris);
-      min-width: 24px;
-    }
-    .datos-candidato { flex-grow: 1; padding: 0 8px; }
-    .datos-candidato h3 { font-size: 0.78rem; font-weight: 800; color: var(--texto-oscuro); line-height: 1.1; }
-    .datos-candidato p { font-size: 0.65rem; color: var(--texto-gris); margin-top: 1px; }
+    .posicion { font-size: 0.85rem; font-weight: 900; color: var(--texto-gris); min-width: 22px; }
+    .datos-candidato { flex-grow: 1; padding: 0 6px; }
+    .datos-candidato h3 { font-size: 0.74rem; font-weight: 800; color: var(--texto-oscuro); line-height: 1.1; }
+    .datos-candidato p { font-size: 0.62rem; color: var(--texto-gris); }
 
     .tag-electo {
-      font-size: 0.58rem;
-      font-weight: 800;
-      background: var(--verde-claro);
-      color: var(--verde-oscuro);
-      padding: 1px 5px;
-      border-radius: 4px;
-      border: 1px solid var(--verde-principal);
-      display: inline-block;
-      margin-left: 4px;
+      font-size: 0.55rem; font-weight: 800; background: var(--verde-claro);
+      color: var(--verde-oscuro); padding: 1px 4px; border-radius: 4px;
+      border: 1px solid var(--verde-principal); display: inline-block;
     }
 
-    .votos-badge { text-align: right; min-width: 65px; }
-    .votos-badge strong { font-size: 0.9rem; color: var(--texto-oscuro); display: block; line-height: 1; }
-    .votos-badge span { font-size: 0.6rem; color: var(--texto-gris); }
+    .votos-badge { text-align: right; min-width: 55px; }
+    .votos-badge strong { font-size: 0.88rem; color: var(--texto-oscuro); display: block; line-height: 1; }
+    .votos-badge span { font-size: 0.58rem; color: var(--texto-gris); }
 
-    /* Enlace para volver */
     .btn-volver {
-      display: block;
-      text-align: center;
-      background: var(--verde-principal);
-      color: var(--blanco);
-      text-decoration: none;
-      font-size: 0.75rem;
-      font-weight: 800;
-      padding: 10px;
-      border-radius: 20px;
-      margin-top: 12px;
-      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+      display: block; text-align: center; background: var(--verde-oscuro);
+      color: var(--blanco); text-decoration: none; font-size: 0.72rem;
+      font-weight: 800; padding: 8px; border-radius: 20px; margin-top: 8px;
     }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <div class="header">
-      <h1>Junta Municipal de Tomás Romero Pereira</h1>
-      <p>Proyección Oficial de los 12 Concejales Electos (D'Hondt + Desbloqueo)</p>
-    </div>
+    <div>
+      <div class="header">
+        <h1>Concejales Electos (12 Bancas)</h1>
+        <p>Sistema D'Hondt + Voto Preferencial (Tomás Romero Pereira)</p>
+      </div>
 
-    <!-- Banner Destacado Armando -->
-    <div class="banner-electo">
-      <h2>🎉 ¡ARMANDO KEGLER ELECTO CONCEJAL!</h2>
-      <p>La Lista 9 aseguró <b>3 bancas</b> y Armando ingresa como el <b>3.° más votado</b> de su lista.</p>
-    </div>
+      <!-- Selector de Páginas de 6 en 6 -->
+      <div class="paginador">
+        <button class="btn-pag activa" id="btn-p1" onclick="cambiarPagina(1)">
+          Bancas 1 al 6
+        </button>
+        <button class="btn-pag" id="btn-p2" onclick="cambiarPagina(2)">
+          Bancas 7 al 12 (⭐ Kegler)
+        </button>
+      </div>
 
-    <!-- Resumen de Bancas por Lista -->
-    <div class="bancas-resumen">
-      <div class="banca-card" style="border-top: 3px solid var(--rojo-anr);">
-        <span>Lista 1 (ANR)</span>
-        <strong style="color: var(--rojo-anr);">7</strong>
-      </div>
-      <div class="banca-card" style="border-top: 3px solid var(--verde-principal);">
-        <span>Lista 9 (TRP)</span>
-        <strong style="color: var(--verde-principal);">3</strong>
-      </div>
-      <div class="banca-card" style="border-top: 3px solid var(--amarillo-l1000);">
-        <span>Lista 1000</span>
-        <strong style="color: var(--amarillo-l1000);">1</strong>
-      </div>
-      <div class="banca-card" style="border-top: 3px solid var(--azul-l123);">
-        <span>Lista 123</span>
-        <strong style="color: var(--azul-l123);">1</strong>
-      </div>
-    </div>
-
-    <!-- Lista de los 12 Concejales Ganadores -->
-    <div class="lista-concejales" id="tabla-ganadores">
-      <!-- Generado dinámicamente por JavaScript -->
+      <!-- Contenedor de las 6 bancas -->
+      <div class="lista-concejales" id="tabla-ganadores"></div>
     </div>
 
     <a href="index.html" class="btn-volver">⬅ Volver al Cómputo Principal</a>
   </div>
 
   <script>
-    const totalBancas = 12;
-
     const datosElectorales = [
       {
         listaNombre: "Lista 1 - PARTIDO COLORADO",
@@ -194,12 +126,7 @@
           { nombre: "MAGNO CHAVEZ RIVERO", pref: 493 },
           { nombre: "ALAN ENRIQUE AMARILLA PAIVA", pref: 484 },
           { nombre: "IRENEO GONZALEZ BRITEZ", pref: 467 },
-          { nombre: "ANDRES BENITEZ", pref: 451 },
-          { nombre: "MARIZOL ROLON DE NUÑEZ", pref: 427 },
-          { nombre: "ADALBERTO CABALLERO AYALA", pref: 375 },
-          { nombre: "DR. DIEGO SERVIAN", pref: 351 },
-          { nombre: "ELIGIO SAMUDIO", pref: 178 },
-          { nombre: "CARLOS ALFREDO LOPEZ VERA", pref: 163 }
+          { nombre: "ANDRES BENITEZ", pref: 451 }
         ]
       },
       {
@@ -209,128 +136,97 @@
         candidatos: [
           { nombre: "RAMON ANTONIO LOPEZ BRITEZ", pref: 691 },
           { nombre: "FEDERICO DAMIAN FLORENTIN SEGOVIA", pref: 475 },
-          { nombre: "ARMANDO KEGLER SAUCEDO", pref: 328 },
-          { nombre: "ALBERTO BENITEZ ANZUATEGUI", pref: 319 },
-          { nombre: "JOSE DEL PILAR ESPINOZA RUIZ DIAZ", pref: 183 },
-          { nombre: "FEDERICO WILLMAR VELAZQUEZ CAÑETE", pref: 175 },
-          { nombre: "RAMON ANTONIO FLEITAS ACOSTA", pref: 165 },
-          { nombre: "FLORINDA ARAUJO DE IBARRA", pref: 151 },
-          { nombre: "NANCY MARIVEL GAUTO VALLEJOS", pref: 121 },
-          { nombre: "PABLO FRETEZ GUTIERREZ", pref: 112 },
-          { nombre: "VIRGILIO ORTIZ", pref: 89 },
-          { nombre: "DEMETRIO GAONA RIOS", pref: 87 }
+          { nombre: "ARMANDO KEGLER SAUCEDO", pref: 328 }
         ]
       },
       {
-        listaNombre: "Lista 1000 - UNIDOS POR EL CAMBIO",
+        listaNombre: "Lista 1000 - UNIDOS",
         codigoClase: "l1000",
         votosTotales: 1570,
-        candidatos: [
-          { nombre: "BELGRANO CIBILS", pref: 328 },
-          { nombre: "ABG. MIGUEL VILLAGRA", pref: 317 },
-          { nombre: "LIC. HERMES BARRIOS ALLENDE", pref: 213 }
-        ]
+        candidatos: [{ nombre: "BELGRANO CIBILS", pref: 328 }]
       },
       {
         listaNombre: "Lista 123 - YO CREO",
         codigoClase: "l123",
         votosTotales: 921,
-        candidatos: [
-          { nombre: "PEDRO ALFONSO ESCOBAR FARIÑA", pref: 288 },
-          { nombre: "JOSE DOMINGO AYALA VILLALBA", pref: 134 }
-        ]
-      },
-      {
-        listaNombre: "Lista 2 - PLRA",
-        codigoClase: "l2",
-        votosTotales: 355,
-        candidatos: [{ nombre: "SONIA MARTINEZ", pref: 154 }]
-      },
-      {
-        listaNombre: "Lista 21 - FUERZA JOVEN",
-        codigoClase: "l21",
-        votosTotales: 329,
-        candidatos: [{ nombre: "LEONARDO VERGARA", pref: 90 }]
+        candidatos: [{ nombre: "PEDRO ALFONSO ESCOBAR", pref: 288 }]
       }
     ];
 
-    // ALGORITMO D'HONDT + VOTO PREFERENCIAL
-    function calcularConcejalesElectos(listas, bancasTotales) {
-      // 1. Generar todos los cocientes D'Hondt
+    function calcular12Concejales() {
       const cocientes = [];
-      listas.forEach(partido => {
-        for (let divisor = 1; divisor <= bancasTotales; divisor++) {
-          cocientes.push({
-            partido: partido.listaNombre,
-            clase: partido.codigoClase,
-            cociente: partido.votosTotales / divisor,
-            divisor: divisor
-          });
+      datosElectorales.forEach(p => {
+        for (let d = 1; d <= 12; d++) {
+          cocientes.push({ partido: p.listaNombre, clase: p.codigoClase, cociente: p.votosTotales / d });
         }
       });
-
-      // 2. Ordenar cocientes de mayor a menor y tomar el Top 12
       cocientes.sort((a, b) => b.cociente - a.cociente);
-      const bancasAsignadas = cocientes.slice(0, bancasTotales);
+      const top12 = cocientes.slice(0, 12);
 
-      // 3. Contar bancas obtenidas por cada lista
       const bancasPorPartido = {};
-      bancasAsignadas.forEach(b => {
-        bancasPorPartido[b.partido] = (bancasPorPartido[b.partido] || 0) + 1;
-      });
+      top12.forEach(b => bancasPorPartido[b.partido] = (bancasPorPartido[b.partido] || 0) + 1);
 
-      // 4. Seleccionar los candidatos más votados (PREF) de cada lista ganadora
-      const ganadoresFinales = [];
-      listas.forEach(partido => {
-        const cantidadBancas = bancasPorPartido[partido.listaNombre] || 0;
-        if (cantidadBancas > 0) {
-          // Ordenar candidatos por voto preferencial descendente
-          const candidatosOrdenados = [...partido.candidatos].sort((a, b) => b.pref - a.pref);
-          // Tomar tantos candidatos como bancas ganó el partido
-          for (let i = 0; i < cantidadBancas; i++) {
-            if (candidatosOrdenados[i]) {
-              ganadoresFinales.push({
-                nombre: candidatosOrdenados[i].nombre,
-                partido: partido.listaNombre,
-                clase: partido.codigoClase,
-                pref: candidatosOrdenados[i].pref,
-                ordenInterno: i + 1
-              });
-            }
+      const ganadores = [];
+      datosElectorales.forEach(p => {
+        const numBancas = bancasPorPartido[p.listaNombre] || 0;
+        const ord = [...p.candidatos].sort((a, b) => b.pref - a.pref);
+        for (let i = 0; i < numBancas; i++) {
+          if (ord[i]) {
+            ganadores.push({
+              nombre: ord[i].nombre,
+              partido: p.listaNombre,
+              clase: p.codigoClase,
+              pref: ord[i].pref,
+              bancaPart: i + 1
+            });
           }
         }
       });
 
-      // 5. Ordenar el listado final (primero por bancas del partido, o por votos de preferencia)
-      ganadoresFinales.sort((a, b) => b.pref - a.pref);
-      return ganadoresFinales;
+      ganadores.sort((a, b) => b.pref - a.pref);
+      return ganadores;
     }
 
-    // RENDERIZAR EN PANTALLA
-    const electos = calcularConcejalesElectos(datosElectorales, totalBancas);
-    const contenedor = document.getElementById('tabla-ganadores');
+    const todosLosConcejales = calcular12Concejales();
+    let paginaActual = 1;
 
-    electos.forEach((c, index) => {
-      const esKegler = c.nombre.includes("KEGLER");
-      const fila = document.createElement('div');
-      fila.className = `concejal-row ${c.clase} ${esKegler ? 'kegler-highlight' : ''}`;
+    function renderizarPagina(pag) {
+      paginaActual = pag;
+      document.getElementById('btn-p1').className = `btn-pag ${pag === 1 ? 'activa' : ''}`;
+      document.getElementById('btn-p2').className = `btn-pag ${pag === 2 ? 'activa' : ''}`;
 
-      fila.innerHTML = `
-        <div class="posicion">#${index + 1}</div>
-        <div class="datos-candidato">
-          <h3>
-            ${c.nombre}
-            ${esKegler ? '<span class="tag-electo">¡OPCIÓN 4!</span>' : ''}
-          </h3>
-          <p>${c.partido.split(' - ')[0]} (Banca ${c.ordenInterno} del partido)</p>
-        </div>
-        <div class="votos-badge">
-          <strong style="${esKegler ? 'color: var(--naranja); font-size: 1.05rem;' : ''}">${c.pref.toLocaleString('es-PY')}</strong>
-          <span>Votos Pref.</span>
-        </div>
-      `;
-      contenedor.appendChild(fila);
-    });
+      const inicio = (pag - 1) * 6;
+      const fin = inicio + 6;
+      const grupo = todosLosConcejales.slice(inicio, fin);
+
+      const cont = document.getElementById('tabla-ganadores');
+      cont.innerHTML = "";
+
+      grupo.forEach((c, idx) => {
+        const posReal = inicio + idx + 1;
+        const esKegler = c.nombre.includes("KEGLER");
+        const div = document.createElement('div');
+        div.className = `concejal-row ${c.clase} ${esKegler ? 'kegler-highlight' : ''}`;
+
+        div.innerHTML = `
+          <div class="posicion">#${posReal}</div>
+          <div class="datos-candidato">
+            <h3>${c.nombre} ${esKegler ? '<span class="tag-electo">¡OPCIÓN 4!</span>' : ''}</h3>
+            <p>${c.partido.split(' - ')[0]} (Banca ${c.bancaPart})</p>
+          </div>
+          <div class="votos-badge">
+            <strong style="${esKegler ? 'color: var(--naranja); font-size: 0.95rem;' : ''}">${c.pref.toLocaleString('es-PY')}</strong>
+            <span>Votos Pref.</span>
+          </div>
+        `;
+        cont.appendChild(div);
+      });
+    }
+
+    function cambiarPagina(p) { renderizarPagina(p); }
+
+    // Iniciar en página 1
+    renderizarPagina(1);
   </script>
 </body>
 </html>
