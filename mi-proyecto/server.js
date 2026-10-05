@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.5";
+const VERSION = "2.12.6";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -392,7 +392,7 @@ app.get("/api/visitas", async (req, res) => {
       cache: "no-store",
       headers: {
         "Accept": "text/html,application/xhtml+xml",
-        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.5"
+        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.6"
       }
     });
     clearTimeout(timeout);

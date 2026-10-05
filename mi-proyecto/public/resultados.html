@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#071226">
-  <title>TREP en Vivo - Armando Kegler · 2.12.5</title>
+  <title>TREP en Vivo - Armando Kegler · 2.12.6</title>
   <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js">
 const SHARE_URL="https://armando-kegler.onrender.com/";
 const SHARE_TEXT="Resultados TREP · Armando Kegler · Tomás Romero Pereira";
@@ -42,7 +42,7 @@ async function shareGeneric(red){
     .flip-box{perspective:1000px;width:100%;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.girado .flip-inner{transform:rotateY(180deg)}
     .front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;box-shadow:0 3px 9px #00000012}.back{transform:rotateY(180deg)}
     #top{height:300px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:6px 9px;display:flex;flex-direction:column;justify-content:space-between;text-align:center}
-    .hint{align-self:center;font-size:.69rem;font-weight:900;padding:5px 13px;border-radius:20px;border:2px solid var(--naranja);background:#ea580c;color:#fff;box-shadow:0 0 11px #ea580c88}
+    .hint{align-self:center;font-size:.69rem;border:0;cursor:pointer;font-weight:900;padding:5px 13px;border-radius:20px;border:2px solid var(--naranja);background:#ea580c;color:#fff;box-shadow:0 0 11px #ea580c88}
     .candidate{display:flex;justify-content:center;align-items:center;gap:10px}.photo{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--naranja)}
     .info{text-align:left}.pills{display:flex;gap:4px}.pill{font-size:.61rem;font-weight:900;padding:2px 6px;border-radius:6px;text-transform:uppercase}.l9{background:#e8f5e9;color:var(--verde2);border:1px solid var(--verde)}.op{background:var(--naranja);color:#fff}
     .cargo{font-size:.62rem;font-weight:800;color:var(--naranja)}.name{font-size:.90rem;font-weight:900;color:var(--verde2)}
@@ -59,16 +59,16 @@ async function shareGeneric(red){
     @media(max-height:780px){#top{min-height:272px}.diag{display:none}.phone{border-radius:32px}.container{gap:5px}}
   
 .social-share{display:flex;justify-content:center;align-items:center;gap:10px;margin:5px 0 2px}
-.social-share button{width:28px;height:28px;border:0;background:transparent;padding:0;display:grid;place-items:center;cursor:pointer;border-radius:50%}
+.social-share button{width:30px;height:30px;border:0;background:transparent;padding:2px;display:grid;place-items:center;cursor:pointer;border-radius:50%}
 .social-share button:active{transform:scale(.94)}
-.social-share svg{width:22px;height:22px;display:block}
+.social-share svg{width:22px;height:22px;display:block}.social-share img{width:24px;height:24px;object-fit:contain;display:block}
 @media(max-width:460px){.social-share{gap:9px;margin-top:4px}.social-share button{width:27px;height:27px}.social-share svg{width:21px;height:21px}}
 </style>
 </head>
 <body>
 <div class="phone">
   <main class="container">
-    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">2.12.5</span></p></header>
+    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">2.12.6</span></p></header>
 
     <div class="timer">
       <span><span id="estado" class="live">● Conectando</span> | Corte: <b id="hora">--:--:--</b></span>
@@ -84,25 +84,18 @@ async function shareGeneric(red){
     <section id="top" class="flip-box">
       <div class="flip-inner">
         <div class="front front-k">
-          <div class="hint">👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS ↻</div>
+          <button id="openConcejales" class="hint" type="button">👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS ↻</button>
           <div class="candidate">
             <img class="photo" src="kegler.jpg" alt="Armando Kegler">
             <div class="info"><div class="pills"><span class="pill l9">Lista 9</span><span class="pill op">Opción 4</span></div><div class="cargo">CONCEJAL MUNICIPAL</div><div class="name">ARMANDO KEGLER</div></div>
           </div>
           
+
 <div class="social-share" aria-label="Compartir">
-  <button type="button" title="Instagram" aria-label="Compartir en Instagram" onclick="shareGeneric('Instagram')">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="#E1306C" stroke-width="2"/><circle cx="17.3" cy="6.8" r="1.2" fill="#E1306C"/></svg>
-  </button>
-  <button type="button" title="TikTok" aria-label="Compartir en TikTok" onclick="shareGeneric('TikTok')">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4v9.1a4.1 4.1 0 1 1-3-3.95" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/><path d="M14 4c.6 2.2 2 3.5 4 3.8" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"/></svg>
-  </button>
-  <button type="button" title="X" aria-label="Compartir en X" onclick="shareX()">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#111" d="M5 4h4.1l3.6 5.1L17 4h2l-5.4 6.6L20 20h-4.1l-4-5.7L7.1 20H5l5.9-7.2L5 4Zm3 1.7 8.8 12.6h1.3L9.3 5.7H8Z"/></svg>
-  </button>
-  <button type="button" title="Facebook" aria-label="Compartir en Facebook" onclick="shareFacebook()">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#1877F2"/><path fill="#fff" d="M13.4 20v-7h2.4l.4-2.7h-2.8V8.6c0-.8.2-1.3 1.4-1.3h1.5V4.9c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8v1.7H8V13h2.4v7h3Z"/></svg>
-  </button>
+  <button type="button" title="Instagram" aria-label="Compartir en Instagram" onclick="event.stopPropagation();shareGeneric('Instagram')"><img src="instagram.png" alt="Instagram"></button>
+  <button type="button" title="TikTok" aria-label="Compartir en TikTok" onclick="event.stopPropagation();shareGeneric('TikTok')"><img src="tiktok.png" alt="TikTok"></button>
+  <button type="button" title="X" aria-label="Compartir en X" onclick="event.stopPropagation();shareX()"><img src="x.png" alt="X"></button>
+  <button type="button" title="Facebook" aria-label="Compartir en Facebook" onclick="event.stopPropagation();shareFacebook()"><img src="facebook.png" alt="Facebook"></button>
 </div>
 <div class="votes"><strong id="kegler">—</strong><span>Votos preferenciales obtenidos</span></div>
           <div class="subtotal">Total Lista 9 (Concejales): <b id="lista9">—</b> votos</div>
@@ -157,7 +150,7 @@ function renderRows(){
 }
 function closeFlip(){flipped=false;$("top").classList.remove("girado");setTimeout(()=>$("bottom").classList.remove("girado"),220);clearTimeout(flipTimeout);clearInterval(flipInterval)}
 function flip(){if(flipped){closeFlip();return}flipped=true;$("top").classList.add("girado");setTimeout(()=>$("bottom").classList.add("girado"),420);let s=10;$("auto").textContent=`Auto-regresa en ${s}s`;flipInterval=setInterval(()=>{s--;$("auto").textContent=`Auto-regresa en ${Math.max(s,0)}s`},1000);flipTimeout=setTimeout(closeFlip,10000)}
-$("top").addEventListener("click",e=>{if(e.target.closest(".tab"))return;flip()});$("bottom").addEventListener("click",flip);
+$("openConcejales").addEventListener("click",e=>{e.stopPropagation();flip()});
 $("t1").onclick=e=>{e.stopPropagation();page=1;renderRows()};$("t2").onclick=e=>{e.stopPropagation();page=2;renderRows()};renderRows();
 
 function estadoUI(data){
