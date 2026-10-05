@@ -55,7 +55,6 @@
       padding-bottom: 2px;
     }
 
-    /* Header */
     .header {
       background: linear-gradient(135deg, var(--verde-oscuro), var(--verde-principal));
       color: var(--blanco);
@@ -69,7 +68,6 @@
     .header h1 { font-size: 0.92rem; font-weight: 800; text-transform: uppercase; }
     .header p { font-size: 0.65rem; opacity: 0.9; }
 
-    /* Barra de Estado */
     .timer-container {
       display: flex;
       justify-content: space-between;
@@ -78,7 +76,7 @@
       padding: 4px 10px;
       border-radius: 50px;
       border: 1px solid #dcdcdc;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       flex-shrink: 0;
     }
     .live-dot { color: #16a34a; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; }
@@ -100,14 +98,14 @@
     .btn-refresh:active { transform: scale(0.95); background: var(--verde-oscuro); }
 
     /* =========================================
-       SISTEMA 3D FLIP CARD ANIMADO
+       SISTEMA 3D FLIP CARD
        ========================================= */
     .flip-container {
       perspective: 1000px;
       flex-grow: 1;
       display: flex;
       flex-direction: column;
-      min-height: 240px;
+      min-height: 245px;
       max-height: 42dvh;
     }
 
@@ -135,11 +133,11 @@
       top: 0; left: 0;
     }
 
-    /* CARA FRONTAL (Armando Kegler) */
+    /* CARA FRONTAL */
     .flip-card-front {
       background: var(--blanco);
       border: 1.5px solid var(--verde-principal);
-      padding: 7px 10px;
+      padding: 6px 10px;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -147,25 +145,36 @@
       cursor: pointer;
     }
 
-    /* Globito Sutil Indicador */
+    /* CARTEL LLAMATIVO Y PARPADEANTE CADA 1 SEGUNDO */
     .globo-hint {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 4px;
-      background: #fff7ed;
-      color: var(--naranja);
-      border: 1px dashed var(--naranja);
-      font-size: 0.62rem;
-      font-weight: 800;
-      padding: 2px 8px;
+      gap: 5px;
+      font-size: 0.76rem; /* MÁS GRANDE */
+      font-weight: 900;
+      padding: 5px 12px;
       border-radius: 20px;
-      margin: 0 auto 2px auto;
-      animation: pulso 2s infinite ease-in-out;
+      margin: 0 auto 3px auto;
+      cursor: pointer;
+      border: 2px solid var(--naranja);
+      animation: parpadeoLlamativo 1s infinite alternate ease-in-out;
     }
-    @keyframes pulso {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.03); background: #ffedd5; }
+
+    @keyframes parpadeoLlamativo {
+      0% {
+        transform: scale(0.97);
+        background-color: #ffedd5;
+        color: #c2410c;
+        box-shadow: 0 0 3px rgba(243, 108, 33, 0.3);
+      }
+      100% {
+        transform: scale(1.04);
+        background-color: #ea580c;
+        color: #ffffff;
+        border-color: #ffffff;
+        box-shadow: 0 0 14px rgba(234, 88, 12, 0.85);
+      }
     }
 
     .kegler-top-row { display: flex; align-items: center; justify-content: center; gap: 10px; }
@@ -194,7 +203,7 @@
     .votos-etiqueta { font-size: 0.62rem; color: var(--texto-gris); text-transform: uppercase; font-weight: 700; }
     .subtotal-txt { font-size: 0.68rem; color: var(--texto-gris); }
 
-    /* CARA TRASERA (Los 12 Concejales en 2 páginas de 6) */
+    /* CARA TRASERA */
     .flip-card-back {
       background: var(--blanco);
       border: 1.5px solid var(--verde-oscuro);
@@ -217,7 +226,6 @@
       font-size: 0.62rem; font-weight: 700; padding: 2px 7px; cursor: pointer; color: #475569;
     }
 
-    /* Pestañas 1-6 y 7-12 */
     .tabs-pag { display: flex; gap: 4px; margin-bottom: 4px; }
     .tab-btn {
       flex: 1; padding: 4px; border: 1px solid var(--verde-principal);
@@ -226,7 +234,6 @@
     }
     .tab-btn.activa { background: var(--verde-principal); color: #fff; }
 
-    /* Lista compacta de 6 filas */
     .back-lista { display: flex; flex-direction: column; gap: 3px; flex-grow: 1; justify-content: space-around; }
     .mini-row {
       display: flex; align-items: center; justify-content: space-between;
@@ -301,7 +308,6 @@
 <body>
 
   <div class="container">
-    <!-- Header -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
@@ -310,7 +316,7 @@
     <!-- Barra de Tiempo con Hora Oficial -->
     <div class="timer-container">
       <span id="hora-trep">
-        <span class="live-dot">● En Vivo</span> | <span id="hora-valor">21:48:02</span>
+        <span class="live-dot">● En Vivo</span> | Corte: <span id="hora-valor">21:48:02</span>
       </span>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span class="timer-badge" id="countdown">60s</span>
@@ -326,8 +332,9 @@
         
         <!-- FRENTE: ARMANDO KEGLER -->
         <div class="flip-card-front">
+          <!-- CARTEL GRANDE Y PARPADEANTE -->
           <div class="globo-hint">
-            <span>✨ Tocá para ver los 12 Concejales Electos 🔄</span>
+            <span>👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS 🔄</span>
           </div>
 
           <div class="kegler-top-row">
@@ -361,7 +368,6 @@
             <button class="btn-voltear-cerrar" onclick="girarTarjeta(event)">↩ Volver</button>
           </div>
 
-          <!-- Selector de Páginas de 6 en 6 -->
           <div class="tabs-pag">
             <button class="tab-btn activa" id="tab-p1" onclick="verPaginaConcejales(1, event)">
               Bancas 1 al 6
@@ -371,7 +377,6 @@
             </button>
           </div>
 
-          <!-- Contenedor dinámico de 6 concejales -->
           <div class="back-lista" id="back-lista-filas"></div>
         </div>
 
@@ -443,9 +448,7 @@
   </div>
 
   <script>
-    // 12 CONCEJALES SEGÚN D'HONDT Y VOTO PREFERENCIAL
     const concejalesOficiales = [
-      // PÁGINA 1: BANCAS 1 AL 6
       { pos: 1, nombre: "JUAN SAMIR AFARA", partido: "L1 - ANR", votos: 889, clase: "l1", esKegler: false },
       { pos: 2, nombre: "RAMON ANTONIO LOPEZ", partido: "L9 - TRP", votos: 691, clase: "l9", esKegler: false },
       { pos: 3, nombre: "EDGAR ORLANDO GONZALEZ", partido: "L1 - ANR", votos: 675, clase: "l1", esKegler: false },
@@ -453,7 +456,6 @@
       { pos: 5, nombre: "BELGRANO CIBILS", partido: "L1000 - UNIDOS", votos: 328, clase: "l1000", esKegler: false },
       { pos: 6, nombre: "FEDERICO FLORENTIN", partido: "L9 - TRP", votos: 475, clase: "l9", esKegler: false },
       
-      // PÁGINA 2: BANCAS 7 AL 12 (ARMANDO KEGLER ELECTO)
       { pos: 7, nombre: "MAGNO CHAVEZ RIVERO", partido: "L1 - ANR", votos: 493, clase: "l1", esKegler: false },
       { pos: 8, nombre: "ALAN ENRIQUE AMARILLA", partido: "L1 - ANR", votos: 484, clase: "l1", esKegler: false },
       { pos: 9, nombre: "ARMANDO KEGLER ⭐", partido: "L9 - TRP (Opción 4)", votos: 328, clase: "l9", esKegler: true },
@@ -462,13 +464,11 @@
       { pos: 12, nombre: "ANDRES BENITEZ", partido: "L1 - ANR", votos: 451, clase: "l1", esKegler: false }
     ];
 
-    // ANIMACIÓN 3D DE GIRO
     function girarTarjeta(e) {
       if (e) e.stopPropagation();
       document.getElementById('tarjeta-kegler').classList.toggle('girado');
     }
 
-    // NAVEGACIÓN EN EL DORSO: 6 EN 6
     function verPaginaConcejales(pag, e) {
       if (e) e.stopPropagation();
       document.getElementById('tab-p1').className = `tab-btn ${pag === 1 ? 'activa' : ''}`;
@@ -485,16 +485,14 @@
         row.innerHTML = `
           <span class="pos-mini">#${c.pos}</span>
           <span class="nombre-mini">${c.nombre} <b style="color:var(--texto-gris); font-size:0.6rem;">(${c.partido})</b></span>
-          <span class="votos-mini" style="${c.esKegler ? 'color: var(--naranja); font-size: 0.72rem;' : ''}">${c.votos}</span>
+          <span class="votos-mini" style="${c.esKegler ? 'color: var(--naranja); font-size: 0.74rem;' : ''}">${c.votos}</span>
         `;
         cont.appendChild(row);
       });
     }
 
-    // Inicializar el dorso en la página 1
     verPaginaConcejales(1);
 
-    // SISTEMA DE TIEMPO REAL
     let timer = 60;
 
     async function actualizarTREP() {
