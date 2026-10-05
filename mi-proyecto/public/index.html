@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#071226">
-  <title>TREP en Vivo - Armando Kegler · 2.12.3</title>
+  <title>TREP en Vivo - Armando Kegler · 2.12.4</title>
   <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
@@ -18,14 +18,14 @@
     body{display:flex;justify-content:center;padding:30px 0}
     .phone{width:min(445px,100vw);min-height:840px;background:#edf2ef;border:10px solid #26364a;border-radius:42px;padding:10px 11px 9px;box-shadow:0 20px 50px #0007;position:relative;overflow:hidden}
     .container{min-height:810px;display:flex;flex-direction:column;gap:7px}
-    .header{background:linear-gradient(135deg,var(--verde2),var(--verde));color:#fff;padding:8px 10px;border-radius:12px 12px 0 0;text-align:center;border-bottom:3px solid var(--naranja)}
-    .header h1{font-size:1.08rem;font-weight:900;text-transform:uppercase;letter-spacing:.2px}.header p{font-size:.72rem;margin-top:2px}
+    .header{position:relative;background:linear-gradient(135deg,var(--verde2),var(--verde));color:#fff;padding:9px 10px 10px;border-radius:12px 12px 0 0;text-align:center;border-bottom:3px solid var(--naranja)}
+    .header h1{font-size:1.08rem;font-weight:900;text-transform:uppercase;letter-spacing:.2px;text-align:center;line-height:1.05}.header p{font-size:.72rem;margin-top:4px;text-align:center;line-height:1.05}
     .timer{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:7px 10px;border-radius:50px;border:1px solid #d5ddd8;font-size:.76rem;gap:6px}
     .live{font-weight:900;color:#16a34a}.live.stale{color:#d97706}.live.error{color:#dc2626}.live.bridge{color:#dc2626;animation:pulse 1.2s infinite}@keyframes pulse{50%{opacity:.55}}
     .badge{background:var(--naranja);color:#fff;font-weight:800;padding:3px 8px;border-radius:12px}
     button{cursor:pointer}.refresh{border:0;background:var(--verde);color:#fff;border-radius:14px;padding:6px 10px;font-size:.74rem;font-weight:900}
     .diag{background:#fff;border:1px solid #dce4df;border-radius:9px;padding:6px 8px;display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:.63rem;color:var(--gris)}
-    .diag b{color:var(--oscuro)}.diag .wide{grid-column:1/-1}.version{float:right;opacity:.8}
+    .diag b{color:var(--oscuro)}.diag .wide{grid-column:1/-1}.version{position:absolute;right:12px;bottom:9px;float:none;opacity:.82;font-size:.62rem;font-weight:800}
     .flip-box{perspective:1000px;width:100%;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.girado .flip-inner{transform:rotateY(180deg)}
     .front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;box-shadow:0 3px 9px #00000012}.back{transform:rotateY(180deg)}
     #top{height:300px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:6px 9px;display:flex;flex-direction:column;justify-content:space-between;text-align:center}
@@ -37,11 +37,11 @@
     .subtotal{font-size:.66rem;color:var(--gris)}
     .back-k{background:#fff;border:1.5px solid var(--verde2);padding:7px 8px;display:flex;flex-direction:column;height:100%}.back-head{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:26px}.back-head h2{font-size:.80rem;color:var(--verde2);line-height:1.05}.autobadge{font-size:.58rem;background:#e0f2fe;color:#0369a1;padding:3px 6px;border-radius:10px;white-space:nowrap}
     .tabs{display:flex;gap:5px;margin:6px 0}.tab{flex:1;border:1px solid var(--verde);background:#fff;color:var(--verde2);padding:6px 4px;border-radius:7px;font-size:.66rem;font-weight:900}.tab.activa{background:var(--verde);color:#fff}.rows{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0;height:100%}.row{display:flex;align-items:center;padding:5px 7px;border-radius:7px;background:#f8fafc;border-left:4px solid #ccc;font-size:.70rem;min-height:0;flex:1}.row.r{border-left-color:var(--rojo)}.row.g{border-left-color:var(--verde)}.row.y{border-left-color:var(--amarillo)}.row.b{border-left-color:var(--azul)}.row.k{border:1.5px solid var(--verde);border-left:5px solid var(--naranja);background:#ecfdf5;font-weight:900}.pos{min-width:27px;font-weight:900;font-size:.75rem}.rn{flex:1;white-space:normal;overflow:hidden;line-height:1.05;font-weight:700}.rn small{font-size:.58rem;color:#55636b}.rv{font-weight:900;font-size:.76rem;margin-left:6px}
-    #bottom{height:142px}.front-i{background:#fff;border:1px solid #e1e7e3;padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between}.section{display:flex;justify-content:space-between;text-transform:uppercase;font-size:.72rem;font-weight:900;color:var(--gris)}
-    .mayor{display:flex;justify-content:space-between;align-items:center;padding:7px 8px;border-radius:6px}.pen{background:#fffcf5;border-left:4px solid var(--naranja)}.anr{background:#fff8f8;border-left:4px solid var(--rojo)}.person{display:flex;align-items:center;gap:9px}.mini{width:40px;height:40px;border-radius:50%;object-fit:cover}.pi h4{font-size:.80rem;line-height:1.08}.pi p{font-size:.63rem;color:var(--gris)}.res{text-align:right}.res strong{display:block;font-size:1rem}.res span{font-size:.66rem;font-weight:800;color:var(--gris)}
-    .back-b{background:#fff;border:1.5px solid var(--naranja);padding:7px;text-align:center}.elected{background:#fff7ed;border:1px dashed var(--naranja);border-radius:6px;padding:5px}.elected h3{font-size:.72rem;color:var(--naranja)}.elected p{font-size:.56rem}.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:5px}.seat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 2px}.seat span{display:block;font-size:.52rem;color:var(--gris);font-weight:800}.seat strong{font-size:.95rem}
-    .mesas{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #dce4df;border-radius:10px;padding:5px;text-align:center}.mesa span{display:block;font-size:.60rem;color:var(--gris);text-transform:uppercase}.mesa b{font-size:.88rem;color:var(--verde2)}
-    .footer{text-align:center;font-size:.64rem;color:#718096;margin-top:auto;display:flex;justify-content:center;align-items:center;gap:4px;min-height:20px;line-height:1}.footer a{color:#4a5568;text-decoration:none;font-weight:800;display:inline-flex;align-items:center}.footer svg{display:block;vertical-align:middle}
+    #bottom{height:154px}.front-i{background:#fff;border:1px solid #e1e7e3;padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between}.section{display:flex;justify-content:space-between;text-transform:uppercase;font-size:.72rem;font-weight:900;color:var(--gris)}
+    .mayor{display:flex;justify-content:space-between;align-items:center;padding:8px 9px;border-radius:7px;min-height:54px}.pen{background:#fffcf5;border-left:4px solid var(--naranja)}.anr{background:#fff8f8;border-left:4px solid var(--rojo)}.person{display:flex;align-items:center;gap:9px}.mini{width:44px;height:44px;border-radius:50%;object-fit:cover}.pi h4{font-size:.84rem;line-height:1.08}.pi p{font-size:.65rem;color:var(--gris)}.res{text-align:right}.res strong{display:block;font-size:1.05rem}.res span{font-size:.66rem;font-weight:800;color:var(--gris)}
+    .back-b{background:#fff;border:1px solid #dce4df;padding:9px 10px;text-align:left}.seats-title{font-size:.68rem;margin-bottom:7px}.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}.seat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:7px 3px}.seat span{display:block;font-size:.57rem;color:var(--gris);font-weight:800;line-height:1.05}.seat strong{font-size:1.1rem}
+    .mesas{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #dce4df;border-radius:11px;padding:8px 6px;text-align:center;margin-top:auto}.mesa span{display:block;font-size:.64rem;color:var(--gris);text-transform:uppercase}.mesa b{font-size:1rem;color:var(--verde2)}
+    .footer{text-align:center;font-size:.64rem;color:#718096;margin-top:0;display:flex;justify-content:center;align-items:center;gap:4px;min-height:20px;line-height:1}.footer a{color:#4a5568;text-decoration:none;font-weight:800;display:inline-flex;align-items:center}.footer svg{display:block;vertical-align:middle}
     @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{height:300px;min-height:300px;flex:none}}
     @media(max-height:780px){#top{min-height:272px}.diag{display:none}.phone{border-radius:32px}.container{gap:5px}}
   </style>
@@ -49,7 +49,7 @@
 <body>
 <div class="phone">
   <main class="container">
-    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">2.12.3</span></p></header>
+    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">2.12.4</span></p></header>
 
     <div class="timer">
       <span><span id="estado" class="live">● Conectando</span> | Corte: <b id="hora">--:--:--</b></span>
@@ -89,8 +89,13 @@
           <div class="mayor anr"><div class="person"><img class="mini" src="rivas.jpg" alt="Hernán Rivas"><div class="pi"><h4>HERNAN RIVAS</h4><p>Lista 1 - ANR</p></div></div><div class="res"><strong id="rivas" style="color:var(--rojo)">—</strong><span id="rivasP">—</span></div></div>
         </div>
         <div class="back back-b">
-          <div class="elected"><h3>🎉 ¡ARMANDO KEGLER ELECTO CONCEJAL!</h3><p>Lista 9: <b>3 bancas</b> · Armando: <b>3.° más votado</b> de su lista.</p></div>
-          <div class="seats"><div class="seat"><span>Lista 1</span><strong style="color:var(--rojo)">7</strong></div><div class="seat"><span>Lista 9</span><strong style="color:var(--verde)">3</strong></div><div class="seat"><span>Lista 1000</span><strong style="color:var(--amarillo)">1</strong></div><div class="seat"><span>Lista 123</span><strong style="color:var(--azul)">1</strong></div></div>
+          <div class="section seats-title"><span>DISTRIBUCIÓN DE BANCAS (12 CONCEJALES)</span></div>
+          <div class="seats">
+            <div class="seat" style="border-top:3px solid var(--rojo)"><span>Lista 1 (ANR)</span><strong id="pb1" style="color:var(--rojo)">7</strong></div>
+            <div class="seat" style="border-top:3px solid var(--verde)"><span>Lista 9 (TRP)</span><strong id="pb9" style="color:var(--verde)">3</strong></div>
+            <div class="seat" style="border-top:3px solid var(--amarillo)"><span>Lista 1000</span><strong id="pb1000" style="color:var(--amarillo)">1</strong></div>
+            <div class="seat" style="border-top:3px solid var(--azul)"><span>Lista 123</span><strong id="pb123" style="color:var(--azul)">1</strong></div>
+          </div>
         </div>
       </div>
     </section>
@@ -145,6 +150,13 @@ async function actualizar(forzar=false){
        return [i+1,(c.nombre||"").replace(" SAUCEDO","")+(esK?" ⭐":""),etiquetaLista(c),c.votosPreferenciales,claseLista(c.numLista)+(esK?" k":"")];
      });
      renderRows();
+   }
+   if(d.concejales?.bancas){
+     const b=d.concejales.bancas;
+     if($("pb1"))$("pb1").textContent=b["1"]??0;
+     if($("pb9"))$("pb9").textContent=b["9"]??0;
+     if($("pb1000"))$("pb1000").textContent=b["1000"]??0;
+     if($("pb123"))$("pb123").textContent=b["123"]??0;
    }
    if(d.concejal?.armandoKegler){$("kegler").textContent=fmt(d.concejal.armandoKegler.votosPreferenciales);$("lista9").textContent=fmt(d.concejal.armandoKegler.totalLista9Concejales)}
    if(d.intendente?.lista9){$("martinez").textContent=fmt(d.intendente.lista9.votos);$("martinezP").textContent=d.intendente.lista9.porcentaje||"—"}

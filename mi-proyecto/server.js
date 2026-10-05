@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.3";
+const VERSION = "2.12.4";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
