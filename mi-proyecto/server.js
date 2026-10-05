@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.4";
+const VERSION = "2.12.5";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -381,10 +381,48 @@ app.post("/api/visita", (req, res) => {
 
 app.get("/api/visitas", async (req, res) => {
   res.set("Cache-Control", "no-store");
+
+  // 1) Preferido: total de pageviews visible en el dashboard público de GoatCounter.
+  // Requiere GoatCounter -> Settings -> Dashboard viewable by -> Everyone/Public.
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const r = await fetch("https://armando-kegler.goatcounter.com/?t=" + Date.now(), {
+      signal: controller.signal,
+      cache: "no-store",
+      headers: {
+        "Accept": "text/html,application/xhtml+xml",
+        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.5"
+      }
+    });
+    clearTimeout(timeout);
+
+    if (r.ok) {
+      const html = await r.text();
+      const matches = [...html.matchAll(/(?:^|[^\d])([\d][\d.,]*)\s+visits\b/gi)];
+      const valores = matches
+        .map(m => Number(String(m[1]).replace(/\./g, "").replace(/,/g, "")))
+        .filter(Number.isFinite);
+
+      if (valores.length) {
+        const count = Math.max(...valores);
+        return res.json({
+          ok: true,
+          count,
+          source: "GOATCOUNTER_PAGEVIEWS",
+          localFallback: visitasLocales
+        });
+      }
+    }
+  } catch (_) {
+    // Continuar con contador público.
+  }
+
+  // 2) Respaldo: contador público de GoatCounter.
   const urls = [
-    "https://armando-kegler.goatcounter.com/counter/TOTAL.json",
     "https://armando-kegler.goatcounter.com/counter/%2F.json",
-    "https://armando-kegler.goatcounter.com/counter//.json"
+    "https://armando-kegler.goatcounter.com/counter//.json",
+    "https://armando-kegler.goatcounter.com/counter/TOTAL.json"
   ];
 
   for (const url of urls) {
@@ -396,26 +434,27 @@ app.get("/api/visitas", async (req, res) => {
         cache: "no-store",
         headers: { "Accept": "application/json,text/plain,*/*" }
       });
+
       if (r.ok) {
         const j = await r.json();
         const count = Number(j?.count);
         if (Number.isFinite(count)) {
-          clearTimeout(timeout);
           return res.json({
             ok: true,
             count,
-            source: "GOATCOUNTER",
+            source: "GOATCOUNTER_PUBLIC",
             localFallback: visitasLocales
           });
         }
       }
     } catch (_) {
-      // probar siguiente URL / fallback local
+      // Probar siguiente URL.
     } finally {
       clearTimeout(timeout);
     }
   }
 
+  // 3) Último respaldo: contador local de Render.
   res.json({
     ok: true,
     count: visitasLocales,
