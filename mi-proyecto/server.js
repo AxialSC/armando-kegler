@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.8";
+const VERSION = "2.12.9";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 const GOATCOUNTER_ACCESS_TOKEN = process.env.GOATCOUNTER_ACCESS_TOKEN || "";
@@ -382,72 +382,143 @@ app.post("/api/visita", (req, res) => {
 
 app.get("/api/visitas", async (req, res) => {
   res.set("Cache-Control", "no-store");
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000);
-    const gcUrl = "https://armando-kegler.goatcounter.com/?" + (GOATCOUNTER_ACCESS_TOKEN ? "access-token=" + encodeURIComponent(GOATCOUNTER_ACCESS_TOKEN) + "&" : "") + "t=" + Date.now();
-    const r = await fetch(gcUrl, {
-      signal: controller.signal,
-      cache: "no-store",
-      redirect: "follow",
-      headers: {
-        "Accept": "text/html,application/xhtml+xml",
-        "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.8"
-      }
-    });
-    clearTimeout(timeout);
-    if (r.ok) {
-      const html = await r.text();
-      const plain = html
-        .replace(/<script[\s\S]*?<\/script>/gi, " ")
-        .replace(/<style[\s\S]*?<\/style>/gi, " ")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/&nbsp;/gi, " ")
-        .replace(/&amp;/gi, "&")
-        .replace(/\s+/g, " ")
-        .trim();
 
-      const candidatos = [];
-      for (const m of plain.matchAll(/([\d][\d.,]*)\s+out\s+of\s+([\d][\d.,]*)\s+visits\s+shown/gi)) {
-        candidatos.push(Number(String(m[2]).replace(/[.,]/g, "")));
-      }
-      for (const m of plain.matchAll(/Totals?.{0,80}?([\d][\d.,]*)\s+visits\b/gi)) {
-        candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
-      }
-      for (const m of plain.matchAll(/([\d][\d.,]*)\s+visits\b/gi)) {
-        candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
+  // 1) Preferido: dashboard privado de GoatCounter usando el secret access token.
+  // GoatCounter puede entregar una cookie de sesión y redirigir; Node fetch no
+  // conserva cookies automáticamente entre requests, por eso hacemos 2 pasos.
+  if (GOATCOUNTER_ACCESS_TOKEN) {
+    try {
+      const accessUrl =
+        "https://armando-kegler.goatcounter.com/?access-token=" +
+        encodeURIComponent(GOATCOUNTER_ACCESS_TOKEN);
+
+      const c1 = new AbortController();
+      const t1 = setTimeout(() => c1.abort(), 6000);
+
+      const first = await fetch(accessUrl, {
+        signal: c1.signal,
+        redirect: "manual",
+        cache: "no-store",
+        headers: {
+          "Accept": "text/html,application/xhtml+xml",
+          "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.9"
+        }
+      });
+      clearTimeout(t1);
+
+      let setCookies = [];
+      if (typeof first.headers.getSetCookie === "function") {
+        setCookies = first.headers.getSetCookie();
+      } else {
+        const sc = first.headers.get("set-cookie");
+        if (sc) setCookies = [sc];
       }
 
-      const valores = candidatos.filter(v => Number.isFinite(v) && v >= 0);
-      if (valores.length) {
-        const count = Math.max(...valores);
-        console.log(`[${VERSION}] GOATCOUNTER dashboard total=${count}`);
-        return res.json({ ok:true, count, source:"GOATCOUNTER_DASHBOARD", localFallback:visitasLocales });
+      const cookieHeader = setCookies
+        .map(v => String(v).split(";")[0])
+        .filter(Boolean)
+        .join("; ");
+
+      let dashboardResponse = first;
+
+      // Si GoatCounter redirige o entrega cookie, hacemos el segundo request ya autenticado.
+      if (first.status >= 300 && first.status < 400 || cookieHeader) {
+        const location = first.headers.get("location");
+        const target = location
+          ? new URL(location, "https://armando-kegler.goatcounter.com/").toString()
+          : "https://armando-kegler.goatcounter.com/";
+
+        const c2 = new AbortController();
+        const t2 = setTimeout(() => c2.abort(), 6000);
+
+        dashboardResponse = await fetch(target, {
+          signal: c2.signal,
+          redirect: "follow",
+          cache: "no-store",
+          headers: {
+            "Accept": "text/html,application/xhtml+xml",
+            "User-Agent": "Mozilla/5.0 AXIAL-TREP/2.12.9",
+            ...(cookieHeader ? { "Cookie": cookieHeader } : {})
+          }
+        });
+        clearTimeout(t2);
       }
+
+      if (dashboardResponse.ok) {
+        const html = await dashboardResponse.text();
+
+        const plain = html
+          .replace(/<script[\s\S]*?<\/script>/gi, " ")
+          .replace(/<style[\s\S]*?<\/style>/gi, " ")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/&nbsp;/gi, " ")
+          .replace(/&amp;/gi, "&")
+          .replace(/\s+/g, " ")
+          .trim();
+
+        const candidatos = [];
+
+        for (const m of plain.matchAll(/([\d][\d.,]*)\s+out\s+of\s+([\d][\d.,]*)\s+visits\s+shown/gi)) {
+          candidatos.push(Number(String(m[2]).replace(/[.,]/g, "")));
+        }
+
+        for (const m of plain.matchAll(/Totals?.{0,100}?([\d][\d.,]*)\s+visits\b/gi)) {
+          candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
+        }
+
+        for (const m of plain.matchAll(/([\d][\d.,]*)\s+visits\b/gi)) {
+          candidatos.push(Number(String(m[1]).replace(/[.,]/g, "")));
+        }
+
+        const valores = candidatos.filter(v => Number.isFinite(v) && v >= 0);
+
+        if (valores.length) {
+          const count = Math.max(...valores);
+          console.log(`[${VERSION}] GOATCOUNTER privado total=${count}`);
+          return res.json({
+            ok: true,
+            count,
+            source: "GOATCOUNTER_PRIVATE",
+            localFallback: visitasLocales
+          });
+        }
+
+        console.warn(`[${VERSION}] GOATCOUNTER privado: dashboard accesible pero no se encontró total`);
+      }
+    } catch (err) {
+      console.warn(`[${VERSION}] GOATCOUNTER privado no disponible: ${err.message}`);
     }
-  } catch (err) {
-    console.warn(`[${VERSION}] GOATCOUNTER dashboard no disponible: ${err.message}`);
   }
 
+  // 2) Respaldo: contador público de GoatCounter.
   const urls = [
     "https://armando-kegler.goatcounter.com/counter/%2F.json",
     "https://armando-kegler.goatcounter.com/counter//.json",
     "https://armando-kegler.goatcounter.com/counter/TOTAL.json"
   ];
+
   for (const url of urls) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
+
     try {
       const r = await fetch(url + "?t=" + Date.now(), {
         signal: controller.signal,
         cache: "no-store",
         headers: { "Accept": "application/json,text/plain,*/*" }
       });
+
       if (r.ok) {
         const j = await r.json();
         const count = Number(j?.count);
+
         if (Number.isFinite(count)) {
-          return res.json({ ok:true, count, source:"GOATCOUNTER_PUBLIC", localFallback:visitasLocales });
+          return res.json({
+            ok: true,
+            count,
+            source: "GOATCOUNTER_PUBLIC",
+            localFallback: visitasLocales
+          });
         }
       }
     } catch (_) {
@@ -455,7 +526,14 @@ app.get("/api/visitas", async (req, res) => {
       clearTimeout(timeout);
     }
   }
-  res.json({ ok:true, count:visitasLocales, source:"LOCAL_RENDER", note:"Respaldo local: se reinicia si Render reinicia el proceso" });
+
+  // 3) Último respaldo: contador local de Render.
+  res.json({
+    ok: true,
+    count: visitasLocales,
+    source: "LOCAL_RENDER",
+    note: "Respaldo local: se reinicia si Render reinicia el proceso"
+  });
 });
 
 app.get("/api/resultados", (req, res) => {
