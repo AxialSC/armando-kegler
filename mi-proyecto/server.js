@@ -4,14 +4,26 @@ const path = require('path');
 
 const app = express();
 app.use(cors());
+
+// CONTADOR DE VISITAS EN VIVO
+let contadorVisitas = 12; // Inicia con las visitas que ya tenés en GoatCounter
+
+// Cada vez que alguien entra a la web, suma una visita real
+app.use((req, res, next) => {
+  if (req.path === '/' || req.path.endsWith('.html')) {
+    contadorVisitas++;
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const URL_INTENDENTE = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
 const URL_CONCEJALES = "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
 
-// Corte oficial de las 21:48:02
 let estadoActual = {
   ok: true,
+  visitasWeb: contadorVisitas,
   servidorHora: "04-10-2026 21:48:02",
   mesas: {
     total: 71,
@@ -48,6 +60,10 @@ async function consultarTSJE(url) {
 }
 
 app.get('/api/resultados', async (req, res) => {
+  // Suma visita al consultar
+  contadorVisitas++;
+  estadoActual.visitasWeb = contadorVisitas;
+
   const [dataInt, dataConc] = await Promise.all([
     consultarTSJE(URL_INTENDENTE),
     consultarTSJE(URL_CONCEJALES)
