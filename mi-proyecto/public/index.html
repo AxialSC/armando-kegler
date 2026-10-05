@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#071226">
-  <title>TREP en Vivo - Armando Kegler · v2.10.2</title>
+  <title>TREP en Vivo - Armando Kegler · v2.12.0</title>
   <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
@@ -29,7 +29,7 @@
     .diag b{color:var(--oscuro)}.diag .wide{grid-column:1/-1}.version{float:right;opacity:.8}
     .flip-box{perspective:1000px;width:100%;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.girado .flip-inner{transform:rotateY(180deg)}
     .front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;box-shadow:0 3px 9px #00000012}.back{transform:rotateY(180deg)}
-    #top{height:380px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between;text-align:center}
+    #top{height:345px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between;text-align:center}
     .hint{align-self:center;font-size:.72rem;font-weight:900;padding:5px 13px;border-radius:20px;border:2px solid var(--naranja);background:#ea580c;color:#fff;box-shadow:0 0 11px #ea580c88}
     .candidate{display:flex;justify-content:center;align-items:center;gap:10px}.photo{width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid var(--naranja)}
     .info{text-align:left}.pills{display:flex;gap:4px}.pill{font-size:.61rem;font-weight:900;padding:2px 6px;border-radius:6px;text-transform:uppercase}.l9{background:#e8f5e9;color:var(--verde2);border:1px solid var(--verde)}.op{background:var(--naranja);color:#fff}
@@ -43,7 +43,7 @@
     .back-b{background:#fff;border:1.5px solid var(--naranja);padding:7px;text-align:center}.elected{background:#fff7ed;border:1px dashed var(--naranja);border-radius:6px;padding:5px}.elected h3{font-size:.72rem;color:var(--naranja)}.elected p{font-size:.56rem}.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:5px}.seat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 2px}.seat span{display:block;font-size:.52rem;color:var(--gris);font-weight:800}.seat strong{font-size:.95rem}
     .mesas{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #dce4df;border-radius:10px;padding:6px;text-align:center}.mesa span{display:block;font-size:.56rem;color:var(--gris);text-transform:uppercase}.mesa b{font-size:.76rem;color:var(--verde2)}
     .footer{text-align:center;font-size:.58rem;color:#718096;margin-top:auto}.footer a{color:#4a5568;text-decoration:none;font-weight:700}
-    @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{flex:1;min-height:330px;height:auto;max-height:44dvh}}
+    @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{height:345px;min-height:345px;flex:none}}
     @media(max-height:780px){#top{min-height:300px}.diag{display:none}.phone{border-radius:32px}.container{gap:5px}}
   </style>
 </head>
@@ -51,7 +51,7 @@
 <div class="phone">
   <div class="notch"></div>
   <main class="container">
-    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v2.10.2</span></p></header>
+    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v2.12.0</span></p></header>
 
     <div class="timer">
       <span><span id="estado" class="live">● Conectando</span> | Corte: <b id="hora">--:--:--</b></span>
@@ -98,12 +98,18 @@
     </section>
 
     <div class="mesas"><div class="mesa"><span>Mesas</span><b id="mesas">—</b></div><div class="mesa"><span>Procesado</span><b id="procesado" style="color:var(--naranja)">—</b></div><div class="mesa"><span>Total votos</span><b id="total">—</b></div></div>
-    <footer class="footer">Designed & Developed by <a href="https://wa.me/5491164148500" target="_blank">◉ Axial Security</a></footer>
+    <footer class="footer">Designed &amp; Developed by
+      <a href="https://wa.me/5491164148500?text=Hola%2C%20te%20consulto%20desde%20la%20web%20TREP" target="_blank" rel="noopener" aria-label="Contactar a Axial Security por WhatsApp">
+        <span style="display:inline-flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25D366" d="M12.04 2a9.84 9.84 0 0 0-8.42 14.94L2 22l5.2-1.58A9.99 9.99 0 1 0 12.04 2Zm0 17.99a8.04 8.04 0 0 1-4.1-1.12l-.29-.17-3.08.94.95-3-.19-.31A7.93 7.93 0 1 1 12.04 20Zm4.39-5.94c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>Axial Security</span>
+      </a>
+    </footer>
   </main>
 </div>
 <script>
-const candidatos=[
+let candidatos=[
 [1,"JUAN SAMIR AFARA","L1 - ANR",889,"r"],[2,"RAMON ANTONIO LOPEZ","L9 - TRP",691,"g"],[3,"EDGAR ORLANDO GONZALEZ","L1 - ANR",675,"r"],[4,"JUSTO MANUEL VIÑALES","L1 - ANR",574,"r"],[5,"BELGRANO CIBILS","L1000 - UNIDOS",328,"y"],[6,"FEDERICO FLORENTIN","L9 - TRP",475,"g"],[7,"MAGNO CHAVEZ RIVERO","L1 - ANR",493,"r"],[8,"ALAN ENRIQUE AMARILLA","L1 - ANR",484,"r"],[9,"ARMANDO KEGLER ⭐","L9 - TRP (Opción 4)",328,"g k"],[10,"IRENEO GONZALEZ BRITEZ","L1 - ANR",467,"r"],[11,"PEDRO ALFONSO ESCOBAR","L123 - YO CREO",288,"b"],[12,"ANDRES BENITEZ","L1 - ANR",451,"r"]];
+const claseLista=n=>String(n)==="1"?"r":String(n)==="9"?"g":String(n)==="1000"?"y":"b";
+const etiquetaLista=c=>`L${c.numLista} - ${c.partido||""}${c.nombre?.includes("KEGLER")?" (Opción 4)":""}`;
 let page=1, flipped=false, flipTimeout, flipInterval, timer=60;
 const $=id=>document.getElementById(id);
 const fmt=n=>Number(n).toLocaleString("es-PY");
@@ -122,7 +128,7 @@ function estadoUI(data){
  if(data.ok && !data.stale){e.textContent="● En Vivo"}
  else if(data.stale){e.textContent="● Último dato";e.classList.add("stale")}
  else{e.textContent="● Sin conexión";e.classList.add("error")}
- $("hora").textContent=hhmmss(data.servidorHora);
+ $("hora").textContent=hhmmss(data.corteOficial||data.ultimaRecepcion||data.servidorHora);
  $("consulta").textContent=hhmmss(data.ultimaConsulta);
  $("cambio").textContent=hhmmss(data.ultimoCambio);
  $("fuente").textContent=data.source||"TREP / TSJE Paraguay";
@@ -134,6 +140,13 @@ async function actualizar(forzar=false){
    const res=await fetch(url+"?t="+Date.now(),{cache:"no-store"});
    if(!res.ok)throw new Error("HTTP "+res.status);
    const d=await res.json();estadoUI(d);
+   if(Array.isArray(d.concejales?.electos) && d.concejales.electos.length){
+     candidatos=d.concejales.electos.map((c,i)=>{
+       const esK=String(c.nombre||"").toUpperCase().includes("KEGLER");
+       return [i+1,(c.nombre||"").replace(" SAUCEDO","")+(esK?" ⭐":""),etiquetaLista(c),c.votosPreferenciales,claseLista(c.numLista)+(esK?" k":"")];
+     });
+     renderRows();
+   }
    if(d.concejal?.armandoKegler){$("kegler").textContent=fmt(d.concejal.armandoKegler.votosPreferenciales);$("lista9").textContent=fmt(d.concejal.armandoKegler.totalLista9Concejales)}
    if(d.intendente?.lista9){$("martinez").textContent=fmt(d.intendente.lista9.votos);$("martinezP").textContent=d.intendente.lista9.porcentaje||"—"}
    if(d.intendente?.lista1){$("rivas").textContent=fmt(d.intendente.lista1.votos);$("rivasP").textContent=d.intendente.lista1.porcentaje||"—"}

@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.11.1";
+const VERSION = "2.12.0";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -43,6 +43,77 @@ function buscarCandidato(data, partes) {
 function porcentaje(votos, total) {
   if (!Number.isFinite(votos) || !Number.isFinite(total) || total <= 0) return null;
   return ((votos / total) * 100).toFixed(2) + "%";
+}
+
+function extraerCorte(...fuentes) {
+  for (const data of fuentes) {
+    if (!data || typeof data !== "object") continue;
+    for (const clave of ["horaFormateada", "hora_formateada", "fechaHora", "fecha_hora"]) {
+      const valor = data[clave];
+      if (typeof valor === "string" && valor.trim()) return valor.trim();
+    }
+    if (data.hora && typeof data.hora === "object") {
+      const vals = Object.values(data.hora).filter(v => typeof v === "string" || typeof v === "number");
+      const texto = vals.join(" ").trim();
+      if (/\d{2}:\d{2}/.test(texto)) return texto;
+    }
+  }
+  return null;
+}
+
+function calcularBancasDHondt(listas, cantidadBancas = 12) {
+  const cocientes = [];
+  for (const lista of listas) {
+    const votos = Number(lista?.votos);
+    if (!Number.isFinite(votos) || votos < 0) continue;
+    for (let divisor = 1; divisor <= cantidadBancas; divisor++) {
+      cocientes.push({
+        numLista: String(lista.numLista),
+        desPartido: lista.desPartido || "",
+        votosLista: votos,
+        divisor,
+        cociente: votos / divisor
+      });
+    }
+  }
+  cocientes.sort((a, b) =>
+    b.cociente - a.cociente ||
+    b.votosLista - a.votosLista ||
+    Number(a.numLista) - Number(b.numLista)
+  );
+  const ganadores = cocientes.slice(0, cantidadBancas);
+  const bancas = {};
+  for (const g of ganadores) bancas[g.numLista] = (bancas[g.numLista] || 0) + 1;
+  return { bancas, cocientesGanadores: ganadores };
+}
+
+function construirElectos(listas, bancas) {
+  const electos = [];
+  for (const lista of listas) {
+    const numLista = String(lista?.numLista ?? "");
+    const cantidad = Number(bancas[numLista] || 0);
+    const pref = Array.isArray(lista?.candidatosPref) ? [...lista.candidatosPref] : [];
+    pref.sort((a, b) =>
+      Number(b?.votos || 0) - Number(a?.votos || 0) ||
+      Number(a?.ordCandidato || 9999) - Number(b?.ordCandidato || 9999)
+    );
+    pref.slice(0, cantidad).forEach(c => {
+      electos.push({
+        numLista,
+        lista: `Lista ${numLista}`,
+        partido: lista.desPartido || c.desPartido || "",
+        nombre: String(c.nomCandidato || "").trim(),
+        votosPreferenciales: Number(c.votos || 0),
+        opcion: Number(c.ordCandidato || 0)
+      });
+    });
+  }
+  electos.sort((a, b) =>
+    b.votosPreferenciales - a.votosPreferenciales ||
+    Number(a.numLista) - Number(b.numLista) ||
+    a.opcion - b.opcion
+  );
+  return electos.map((c, i) => ({ puesto: i + 1, ...c }));
 }
 
 function esEnteroNoNegativo(v) {
@@ -87,8 +158,14 @@ let estadoActual = {
       nombre: "ARMANDO KEGLER SAUCEDO",
       orden: 4,
       votosPreferenciales: 328,
-      totalLista9Concejales: 3840
+      totalLista9Concejales: 2896
     }
+  },
+  concejales: {
+    metodo: "D'Hondt + voto preferencial",
+    bancasTotales: 12,
+    bancas: {},
+    electos: []
   }
 };
 
@@ -123,6 +200,9 @@ function parsearCarga(body) {
   const vk = Number(kegler.votos);
   const totalLista9 = Number(lista9.votos);
 
+  const { bancas } = calcularBancasDHondt(listasConcejales, 12);
+  const electos = construirElectos(listasConcejales, bancas);
+
   const totales = intData.totales || {};
   const totalVotos = Number(totales.totalVotos);
   const totalMesas = Number(totales.totalMesas);
@@ -139,10 +219,7 @@ function parsearCarga(body) {
   }
 
   return {
-    corteOficial:
-      intData.horaFormateada ||
-      conData.horaFormateada ||
-      null,
+    corteOficial: extraerCorte(intData, conData),
     mesas: {
       total: totalMesas,
       procesadas: mesasPublicadas,
@@ -170,6 +247,12 @@ function parsearCarga(body) {
         votosPreferenciales: vk,
         totalLista9Concejales: totalLista9
       }
+    },
+    concejales: {
+      metodo: "D'Hondt + voto preferencial",
+      bancasTotales: 12,
+      bancas,
+      electos
     }
   };
 }
@@ -234,6 +317,7 @@ app.post("/api/colector", (req, res) => {
       mesas: datos.mesas,
       intendente: datos.intendente,
       concejal: datos.concejal,
+      concejales: datos.concejales,
       corteOficial: datos.corteOficial
     });
 

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<meta name="theme-color" content="#071226"><title>12 Concejales Electos · v2.10.2</title>
+<meta name="theme-color" content="#071226"><title>12 Concejales Electos · v2.12.0</title>
 <style>
 :root{--v:#00873d;--vo:#005a28;--n:#f36c21;--r:#d32f2f;--y:#eab308;--b:#2563eb;--g:#55636b;--w:#fff;--bg:#081326}
 *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
@@ -15,17 +15,20 @@ header{background:linear-gradient(135deg,var(--vo),var(--v));color:#fff;padding:
 .back{display:block;text-align:center;background:var(--vo);color:#fff;text-decoration:none;font-size:.7rem;font-weight:900;padding:9px;border-radius:20px;margin-top:9px}.foot{text-align:center;color:#718096;font-size:.58rem;margin-top:7px}
 @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:8px;border-radius:36px}}
 </style></head><body><main class="phone"><div class="notch"></div>
-<header><h1>Concejales Electos · 12 Bancas</h1><p>Tomás Romero Pereira · D'Hondt / Voto Preferencial</p><div class="ver">v2.10.2</div></header>
+<header><h1>Concejales Electos · 12 Bancas</h1><p>Tomás Romero Pereira · D'Hondt / Voto Preferencial</p><div class="ver">v2.12.0</div></header>
 <div class="status"><span id="st" class="live">● Conectando</span><span>Corte: <b id="corte">--:--:--</b></span></div>
 <div class="tabs"><button id="p1" class="tab on">Bancas 1 al 6</button><button id="p2" class="tab">Bancas 7 al 12 · ⭐ Kegler</button></div>
 <section id="list" class="list"></section>
-<a class="back" href="index.html">⬅ Volver al Cómputo Principal</a><div class="foot">Designed & Developed by Axial Security</div>
+<a class="back" href="index.html">⬅ Volver al Cómputo Principal</a>
+<div class="foot">Designed &amp; Developed by <a href="https://wa.me/5491164148500?text=Hola%2C%20te%20consulto%20desde%20la%20web%20TREP" target="_blank" rel="noopener" style="color:#4a5568;text-decoration:none;font-weight:800">🟢 Axial Security</a></div>
 </main><script>
-const base=[
+let base=[
 [1,"JUAN SAMIR AFARA","L1 - ANR",889,"r"],[2,"RAMON ANTONIO LOPEZ","L9 - TRP",691,"g"],[3,"EDGAR ORLANDO GONZALEZ","L1 - ANR",675,"r"],[4,"JUSTO MANUEL VIÑALES","L1 - ANR",574,"r"],[5,"BELGRANO CIBILS","L1000 - UNIDOS",328,"y"],[6,"FEDERICO FLORENTIN","L9 - TRP",475,"g"],[7,"MAGNO CHAVEZ RIVERO","L1 - ANR",493,"r"],[8,"ALAN ENRIQUE AMARILLA","L1 - ANR",484,"r"],[9,"ARMANDO KEGLER","L9 - TRP · Opción 4",328,"g k"],[10,"IRENEO GONZALEZ BRITEZ","L1 - ANR",467,"r"],[11,"PEDRO ALFONSO ESCOBAR","L123 - YO CREO",288,"b"],[12,"ANDRES BENITEZ","L1 - ANR",451,"r"]];
 let page=1;const $=x=>document.getElementById(x),fmt=n=>Number(n).toLocaleString("es-PY");
 function render(){$("p1").classList.toggle("on",page===1);$("p2").classList.toggle("on",page===2);$("list").innerHTML=base.slice((page-1)*6,page*6).map(c=>`<div class="row ${c[4]}"><span class="pos">#${c[0]}</span><div class="data"><h3>${c[1]} ${c[1].includes("KEGLER")?'<span class="tag">OPCIÓN 4</span>':''}</h3><p>${c[2]}</p></div><div class="vote"><strong>${fmt(c[3])}</strong><span>Votos Pref.</span></div></div>`).join("")}
 $("p1").onclick=()=>{page=1;render()};$("p2").onclick=()=>{page=2;render()};render();
 function time(s){let m=String(s||"").match(/(\d{2}:\d{2}:\d{2})/);return m?m[1]:"--:--:--"}
-async function sync(){try{let r=await fetch("/api/resultados?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error();let d=await r.json();$("corte").textContent=time(d.servidorHora);let s=$("st");if(d.ok&&!d.stale){s.textContent="● En Vivo";s.className="live"}else{s.textContent="● Último dato";s.className="live stale"}if(d.concejal?.armandoKegler?.votosPreferenciales!=null){let k=base.find(x=>x[1]==="ARMANDO KEGLER");k[3]=d.concejal.armandoKegler.votosPreferenciales;render()}}catch(e){$("st").textContent="● Sin conexión";$("st").className="live err"}}sync();setInterval(sync,60000);
+async function sync(){try{let r=await fetch("/api/resultados?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw Error();let d=await r.json();$("corte").textContent=time(d.corteOficial||d.ultimaRecepcion||d.servidorHora);let s=$("st");if(d.ok&&!d.stale){s.textContent="● En Vivo";s.className="live"}else{s.textContent="● Último dato";s.className="live stale"}if(Array.isArray(d.concejales?.electos)&&d.concejales.electos.length){
+base=d.concejales.electos.map((c,i)=>{const n=String(c.nombre||"").replace(" SAUCEDO","");const esK=n.toUpperCase().includes("KEGLER");const cl=String(c.numLista)==="1"?"r":String(c.numLista)==="9"?"g":String(c.numLista)==="1000"?"y":"b";return[i+1,n,`L${c.numLista} - ${c.partido||""}${esK?" · Opción 4":""}`,c.votosPreferenciales,cl+(esK?" k":"")]});render()
+}else if(d.concejal?.armandoKegler?.votosPreferenciales!=null){let k=base.find(x=>x[1].includes("ARMANDO KEGLER"));if(k){k[3]=d.concejal.armandoKegler.votosPreferenciales;render()}}}catch(e){$("st").textContent="● Sin conexión";$("st").className="live err"}}sync();setInterval(sync,60000);
 </script></body></html>
