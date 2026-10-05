@@ -68,6 +68,7 @@
     .header h1 { font-size: 0.92rem; font-weight: 800; text-transform: uppercase; }
     .header p { font-size: 0.65rem; opacity: 0.9; }
 
+    /* Barra del Reloj y Hora Oficial */
     .timer-container {
       display: flex;
       justify-content: space-between;
@@ -78,6 +79,13 @@
       border: 1px solid #dcdcdc;
       font-size: 0.7rem;
       flex-shrink: 0;
+    }
+    .live-dot {
+      color: #16a34a;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
     }
     .timer-badge { background: var(--naranja); color: var(--blanco); font-weight: 700; padding: 2px 7px; border-radius: 12px; }
     
@@ -234,13 +242,17 @@
 <body>
 
   <div class="container">
+    <!-- Header -->
     <div class="header">
       <h1>Tomás Romero Pereira</h1>
       <p>Elecciones Municipales - Datos Oficiales TREP</p>
     </div>
 
+    <!-- Barra de tiempo con Punto Verde + Hora Oficial TREP -->
     <div class="timer-container">
-      <span id="hora-trep" style="color: var(--texto-gris);">TREP: En Vivo</span>
+      <span id="hora-trep">
+        <span class="live-dot">● En Vivo</span> | 21:16:03
+      </span>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span class="timer-badge" id="countdown">60s</span>
         <button class="btn-refresh" id="btn-refresh" onclick="forzarActualizacion()">
@@ -253,7 +265,6 @@
     <div class="card-kegler">
       <div class="kegler-top-row">
         <div class="foto-kegler-container">
-          <!-- CORREGIDO: Carga kegler.jpg (la cara) -->
           <img src="kegler.jpg" alt="Armando Kegler" onerror="this.src='https://ui-avatars.com/api/?name=Armando+Kegler&background=00873d&color=fff';">
         </div>
         <div class="kegler-info">
@@ -311,19 +322,19 @@
       </div>
     </div>
 
-    <!-- MESAS -->
+    <!-- MESAS: Actualizado al 100% de la última captura -->
     <div class="mesas-grid">
       <div class="mesa-item">
         <span>Mesas</span>
-        <b id="mesas-proc">69 / 71</b>
+        <b id="mesas-proc">71 / 71</b>
       </div>
       <div class="mesa-item">
         <span>Procesado</span>
-        <b id="mesas-porc" style="color: var(--naranja);">97.18%</b>
+        <b id="mesas-porc" style="color: var(--naranja);">100.00%</b>
       </div>
       <div class="mesa-item">
         <span>Total Votos</span>
-        <b id="total-votos">11.512</b>
+        <b id="total-votos">11.871</b>
       </div>
     </div>
 
@@ -349,6 +360,7 @@
         const data = await res.json();
         if (!data || !data.ok) return;
 
+        // Armando Kegler
         if (data.concejal?.armandoKegler?.votosPreferenciales) {
           document.getElementById('kegler-votos').innerText = 
             Number(data.concejal.armandoKegler.votosPreferenciales).toLocaleString('es-PY');
@@ -358,6 +370,7 @@
             Number(data.concejal.armandoKegler.totalLista9Concejales).toLocaleString('es-PY');
         }
 
+        // Intendentes
         if (data.intendente?.lista9?.votos) {
           document.getElementById('martinez-votos').innerText = 
             Number(data.intendente.lista9.votos).toLocaleString('es-PY');
@@ -370,15 +383,19 @@
           document.getElementById('rivas-porc').innerText = data.intendente.lista1.porcentaje;
         }
 
+        // Mesas
         if (data.mesas?.procesadas && data.mesas?.total) {
           document.getElementById('mesas-proc').innerText = `${data.mesas.procesadas} / ${data.mesas.total}`;
           document.getElementById('mesas-porc').innerText = data.mesas.porcentaje;
           document.getElementById('total-votos').innerText = Number(data.mesas.totalVotos).toLocaleString('es-PY');
         }
 
+        // Hora exacta publicada por el TREP
         if (data.servidorHora) {
           const partes = data.servidorHora.split(' ');
-          document.getElementById('hora-trep').innerText = `TREP: ${partes[1] || data.servidorHora}`;
+          const soloHora = partes[1] || data.servidorHora;
+          document.getElementById('hora-trep').innerHTML = 
+            `<span class="live-dot">● En Vivo</span> | ${soloHora}`;
         }
       } catch (e) {}
     }
