@@ -7,13 +7,13 @@ const app = express();
 app.use(cors());
 app.use(express.static(path.join(__dirname, "public")));
 
-const VERSION = "2.10.2";
+const VERSION = "2.10.3";
 const POLL_MS = 60_000;
 
 const URL_INTENDENTE =
-  "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
+  "https://resultados.tsje.gov.py/publicacion/dinamics/divulgacion.ajax.php?codeleccion=47&candidatura=1&departamento=7&distrito=53";
 const URL_CONCEJALES =
-  "https://resultados.tsje.gov.py/publicacion/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
+  "https://resultados.tsje.gov.py/publicacion/dinamics/divulgacion.ajax.php?codeleccion=47&candidatura=2&departamento=7&distrito=53";
 
 // Último dato confirmado conocido. Se usa solamente como respaldo y queda
 // explícitamente marcado como "stale" si TREP no puede ser leído.
@@ -120,76 +120,64 @@ function extraerMesas(texto) {
   return null;
 }
 
-async function descargar(url) {
+async function descargarJSON(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15_000);
   try {
     const res = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "Mozilla/5.0 TREP-Monitor-Axial/2.10.2",
-        "Accept": "text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/154.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
+        "Accept-Language": "es-AR,es;q=0.9,en;q=0.6",
+        "Referer": "https://resultados.tsje.gov.py/publicacion/divulgacion.html",
+        "X-Requested-With": "XMLHttpRequest",
         "Cache-Control": "no-cache"
       }
     });
     if (!res.ok) throw new Error(`TREP respondió HTTP ${res.status}`);
-    return await res.text();
-  } finally {
-    clearTimeout(timeout);
-  }
+    const txt = await res.text();
+    try { return JSON.parse(txt); }
+    catch { throw new Error("TREP respondió, pero no devolvió JSON válido"); }
+  } finally { clearTimeout(timeout); }
 }
 
-function parsearTREP(htmlIntendente, htmlConcejales) {
-  const tInt = textoPlano(htmlIntendente);
-  const tCon = textoPlano(htmlConcejales);
-
-  // Verificación estricta: si no aparecen candidatos conocidos, NO declaramos
-  // la consulta como válida. Así evitamos publicar números equivocados.
-  const tieneMartinez = /CONCEPCION\s+MARTINEZ/i.test(tInt);
-  const tieneRivas = /HERNAN\s+RIVAS/i.test(tInt);
-  const tieneKegler = /ARMANDO\s+KEGLER/i.test(tCon);
-
-  if (!tieneMartinez || !tieneRivas || !tieneKegler) {
-    throw new Error("TREP respondió, pero el formato recibido no pudo validarse con seguridad");
-  }
-
-  const martinez = extraerNumeroCercano(tInt, "CONCEPCION MARTINEZ");
-  const rivas = extraerNumeroCercano(tInt, "HERNAN RIVAS");
-  const kegler = extraerNumeroCercano(tCon, "ARMANDO KEGLER");
-
-  if (![martinez, rivas, kegler].every(Number.isFinite)) {
-    throw new Error("Se encontró la elección, pero no fue posible extraer los votos con seguridad");
-  }
-
-  const mesas = extraerMesas(tInt) || extraerMesas(tCon);
-  const totalLista9 =
-    extraerNumeroCercano(tCon, "LISTA 9", 300) ??
-    estadoActual.concejal.armandoKegler.totalLista9Concejales;
-
+function normalizar(s) {
+  return String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+}
+function buscar(data, partes) {
+  const arr = Array.isArray(data?.candidatos) ? data.candidatos : [];
+  return arr.find(c => partes.every(p => normalizar(c.nomCandidato).includes(p)));
+}
+function pct(v,total) {
+  return Number.isFinite(v) && Number.isFinite(total) && total > 0
+    ? ((v/total)*100).toFixed(2)+"%" : null;
+}
+function parsearTREP(intData, conData) {
+  const martinez=buscar(intData,["CONCEPCION","MARTINEZ"]);
+  const rivas=buscar(intData,["HERNAN","RIVAS"]);
+  const kegler=buscar(conData,["ARMANDO","KEGLER"]);
+  if(!martinez||!rivas||!kegler) throw new Error("JSON recibido, pero faltan candidatos esperados");
+  const vm=Number(martinez.votos), vr=Number(rivas.votos), vk=Number(kegler.votos);
+  if(![vm,vr,vk].every(Number.isFinite)) throw new Error("JSON recibido, pero faltan votos");
+  const t=intData.totales||{};
+  const total=Number(t.totalVotos), tm=Number(t.totalMesas), mp=Number(t.mesasPublicadas);
   return {
-    mesas: mesas
-      ? { ...estadoActual.mesas, ...mesas }
-      : estadoActual.mesas,
-    intendente: {
-      lista9: {
-        nombre: "CONCEPCION MARTINEZ",
-        votos: martinez,
-        porcentaje: extraerPorcentajeCercano(tInt, "CONCEPCION MARTINEZ") || estadoActual.intendente.lista9.porcentaje
-      },
-      lista1: {
-        nombre: "HERNAN RIVAS",
-        votos: rivas,
-        porcentaje: extraerPorcentajeCercano(tInt, "HERNAN RIVAS") || estadoActual.intendente.lista1.porcentaje
-      }
+    servidorHora: intData.horaFormateada || horaParaguay(),
+    mesas:{
+      total:Number.isFinite(tm)?tm:estadoActual.mesas.total,
+      procesadas:Number.isFinite(mp)?mp:estadoActual.mesas.procesadas,
+      porcentaje:Number.isFinite(tm)&&tm>0&&Number.isFinite(mp)?((mp/tm)*100).toFixed(2)+"%":estadoActual.mesas.porcentaje,
+      totalVotos:Number.isFinite(total)?total:estadoActual.mesas.totalVotos
     },
-    concejal: {
-      armandoKegler: {
-        nombre: "ARMANDO KEGLER SAUCEDO",
-        orden: 4,
-        votosPreferenciales: kegler,
-        totalLista9Concejales: totalLista9
-      }
-    }
+    intendente:{
+      lista9:{nombre:"CONCEPCION MARTINEZ",votos:vm,porcentaje:pct(vm,total)||estadoActual.intendente.lista9.porcentaje},
+      lista1:{nombre:"HERNAN RIVAS",votos:vr,porcentaje:pct(vr,total)||estadoActual.intendente.lista1.porcentaje}
+    },
+    concejal:{armandoKegler:{
+      nombre:"ARMANDO KEGLER SAUCEDO",orden:4,votosPreferenciales:vk,
+      totalLista9Concejales:estadoActual.concejal.armandoKegler.totalLista9Concejales
+    }}
   };
 }
 
@@ -199,12 +187,12 @@ async function consultarTREP() {
   const ahora = new Date();
 
   try {
-    const [htmlInt, htmlCon] = await Promise.all([
-      descargar(URL_INTENDENTE),
-      descargar(URL_CONCEJALES)
+    const [intData, conData] = await Promise.all([
+      descargarJSON(URL_INTENDENTE),
+      descargarJSON(URL_CONCEJALES)
     ]);
 
-    const datos = parsearTREP(htmlInt, htmlCon);
+    const datos = parsearTREP(intData, conData);
     const firma = JSON.stringify(datos);
 
     if (firma !== firmaUltimosDatos) {
@@ -217,7 +205,7 @@ async function consultarTREP() {
       ...datos,
       ok: true,
       version: VERSION,
-      source: "TREP / TSJE Paraguay",
+      source: "TREP / TSJE Paraguay · JSON oficial",
       status: "LIVE",
       stale: false,
       servidorHora: horaParaguay(ahora),
