@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#071226">
-  <title>TREP en Vivo - Armando Kegler · v2.12.0</title>
+  <title>TREP en Vivo - Armando Kegler · v2.12.1</title>
   <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
@@ -16,16 +16,15 @@
     *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
     html,body{min-height:100%;background:var(--fondo);color:var(--oscuro)}
     body{display:flex;justify-content:center;padding:30px 0}
-    .phone{width:min(445px,100vw);min-height:840px;background:#edf2ef;border:10px solid #26364a;border-radius:42px;padding:0 11px 9px;box-shadow:0 20px 50px #0007;position:relative;overflow:hidden}
-    .notch{width:110px;height:19px;background:#26364a;border-radius:0 0 12px 12px;margin:0 auto -2px;position:relative;z-index:5}
+    .phone{width:min(445px,100vw);min-height:840px;background:#edf2ef;border:10px solid #26364a;border-radius:42px;padding:10px 11px 9px;box-shadow:0 20px 50px #0007;position:relative;overflow:hidden}
     .container{min-height:810px;display:flex;flex-direction:column;gap:7px}
     .header{background:linear-gradient(135deg,var(--verde2),var(--verde));color:#fff;padding:8px 10px;border-radius:12px 12px 0 0;text-align:center;border-bottom:3px solid var(--naranja)}
-    .header h1{font-size:.93rem;font-weight:900;text-transform:uppercase}.header p{font-size:.62rem}
-    .timer{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:5px 10px;border-radius:50px;border:1px solid #d5ddd8;font-size:.66rem}
-    .live{font-weight:900;color:#16a34a}.live.stale{color:#d97706}.live.error{color:#dc2626}
+    .header h1{font-size:1.08rem;font-weight:900;text-transform:uppercase;letter-spacing:.2px}.header p{font-size:.72rem;margin-top:2px}
+    .timer{display:flex;justify-content:space-between;align-items:center;background:#fff;padding:7px 10px;border-radius:50px;border:1px solid #d5ddd8;font-size:.76rem;gap:6px}
+    .live{font-weight:900;color:#16a34a}.live.stale{color:#d97706}.live.error{color:#dc2626}.live.bridge{color:#dc2626;animation:pulse 1.2s infinite}@keyframes pulse{50%{opacity:.55}}
     .badge{background:var(--naranja);color:#fff;font-weight:800;padding:3px 8px;border-radius:12px}
-    button{cursor:pointer}.refresh{border:0;background:var(--verde);color:#fff;border-radius:12px;padding:4px 9px;font-size:.66rem;font-weight:800}
-    .diag{background:#fff;border:1px solid #dce4df;border-radius:9px;padding:5px 8px;display:grid;grid-template-columns:1fr 1fr;gap:2px 8px;font-size:.57rem;color:var(--gris)}
+    button{cursor:pointer}.refresh{border:0;background:var(--verde);color:#fff;border-radius:14px;padding:6px 10px;font-size:.74rem;font-weight:900}
+    .diag{background:#fff;border:1px solid #dce4df;border-radius:9px;padding:6px 8px;display:grid;grid-template-columns:1fr 1fr;gap:3px 8px;font-size:.63rem;color:var(--gris)}
     .diag b{color:var(--oscuro)}.diag .wide{grid-column:1/-1}.version{float:right;opacity:.8}
     .flip-box{perspective:1000px;width:100%;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.girado .flip-inner{transform:rotateY(180deg)}
     .front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;box-shadow:0 3px 9px #00000012}.back{transform:rotateY(180deg)}
@@ -36,22 +35,21 @@
     .cargo{font-size:.62rem;font-weight:800;color:var(--naranja)}.name{font-size:.95rem;font-weight:900;color:var(--verde2)}
     .votes{background:linear-gradient(#fafcfa,#e8f5e9);border:1px dashed var(--verde);border-radius:10px;padding:8px}.votes strong{display:block;font-size:2.25rem;color:var(--verde);line-height:1}.votes span{font-size:.59rem;color:var(--gris);font-weight:800;text-transform:uppercase}
     .subtotal{font-size:.66rem;color:var(--gris)}
-    .back-k{background:#fff;border:1.5px solid var(--verde2);padding:7px 8px;display:flex;flex-direction:column}.back-head{display:flex;justify-content:space-between;align-items:center}.back-head h2{font-size:.72rem;color:var(--verde2)}.autobadge{font-size:.55rem;background:#e0f2fe;color:#0369a1;padding:2px 6px;border-radius:10px}
-    .tabs{display:flex;gap:4px;margin:5px 0}.tab{flex:1;border:1px solid var(--verde);background:#fff;color:var(--verde2);padding:4px;border-radius:6px;font-size:.59rem;font-weight:800}.tab.activa{background:var(--verde);color:#fff}.rows{display:flex;flex-direction:column;gap:4px}.row{display:flex;align-items:center;padding:5px 6px;border-radius:6px;background:#f8fafc;border-left:3px solid #ccc;font-size:.62rem}.row.r{border-left-color:var(--rojo)}.row.g{border-left-color:var(--verde)}.row.y{border-left-color:var(--amarillo)}.row.b{border-left-color:var(--azul)}.row.k{border:1.5px solid var(--verde);border-left:5px solid var(--naranja);background:#ecfdf5;font-weight:900}.pos{min-width:20px;font-weight:900}.rn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rv{font-weight:900}
+    .back-k{background:#fff;border:1.5px solid var(--verde2);padding:7px 8px;display:flex;flex-direction:column}.back-head{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:26px}.back-head h2{font-size:.80rem;color:var(--verde2);line-height:1.05}.autobadge{font-size:.58rem;background:#e0f2fe;color:#0369a1;padding:3px 6px;border-radius:10px;white-space:nowrap}
+    .tabs{display:flex;gap:5px;margin:6px 0}.tab{flex:1;border:1px solid var(--verde);background:#fff;color:var(--verde2);padding:6px 4px;border-radius:7px;font-size:.66rem;font-weight:900}.tab.activa{background:var(--verde);color:#fff}.rows{flex:1;display:grid;grid-template-rows:repeat(6,minmax(0,1fr));gap:5px;min-height:0}.row{display:flex;align-items:center;padding:6px 7px;border-radius:7px;background:#f8fafc;border-left:4px solid #ccc;font-size:.70rem;min-height:0}.row.r{border-left-color:var(--rojo)}.row.g{border-left-color:var(--verde)}.row.y{border-left-color:var(--amarillo)}.row.b{border-left-color:var(--azul)}.row.k{border:1.5px solid var(--verde);border-left:5px solid var(--naranja);background:#ecfdf5;font-weight:900}.pos{min-width:27px;font-weight:900;font-size:.75rem}.rn{flex:1;white-space:normal;overflow:hidden;line-height:1.05;font-weight:700}.rn small{font-size:.58rem;color:#55636b}.rv{font-weight:900;font-size:.76rem;margin-left:6px}
     #bottom{height:125px}.front-i{background:#fff;border:1px solid #e1e7e3;padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between}.section{display:flex;justify-content:space-between;text-transform:uppercase;font-size:.65rem;font-weight:900;color:var(--gris)}
     .mayor{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;border-radius:6px}.pen{background:#fffcf5;border-left:4px solid var(--naranja)}.anr{background:#fff8f8;border-left:4px solid var(--rojo)}.person{display:flex;align-items:center;gap:7px}.mini{width:27px;height:27px;border-radius:50%;object-fit:cover}.pi h4{font-size:.69rem}.pi p{font-size:.56rem;color:var(--gris)}.res{text-align:right}.res strong{display:block;font-size:.85rem}.res span{font-size:.59rem;font-weight:800;color:var(--gris)}
     .back-b{background:#fff;border:1.5px solid var(--naranja);padding:7px;text-align:center}.elected{background:#fff7ed;border:1px dashed var(--naranja);border-radius:6px;padding:5px}.elected h3{font-size:.72rem;color:var(--naranja)}.elected p{font-size:.56rem}.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:5px}.seat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 2px}.seat span{display:block;font-size:.52rem;color:var(--gris);font-weight:800}.seat strong{font-size:.95rem}
     .mesas{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #dce4df;border-radius:10px;padding:6px;text-align:center}.mesa span{display:block;font-size:.56rem;color:var(--gris);text-transform:uppercase}.mesa b{font-size:.76rem;color:var(--verde2)}
-    .footer{text-align:center;font-size:.58rem;color:#718096;margin-top:auto}.footer a{color:#4a5568;text-decoration:none;font-weight:700}
+    .footer{text-align:center;font-size:.64rem;color:#718096;margin-top:auto;display:flex;justify-content:center;align-items:center;gap:4px;min-height:22px}.footer a{color:#4a5568;text-decoration:none;font-weight:800;display:inline-flex;align-items:center}.footer svg{display:block;vertical-align:middle}
     @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{height:345px;min-height:345px;flex:none}}
     @media(max-height:780px){#top{min-height:300px}.diag{display:none}.phone{border-radius:32px}.container{gap:5px}}
   </style>
 </head>
 <body>
 <div class="phone">
-  <div class="notch"></div>
   <main class="container">
-    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v2.12.0</span></p></header>
+    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v2.12.1</span></p></header>
 
     <div class="timer">
       <span><span id="estado" class="live">● Conectando</span> | Corte: <b id="hora">--:--:--</b></span>
@@ -100,7 +98,7 @@
     <div class="mesas"><div class="mesa"><span>Mesas</span><b id="mesas">—</b></div><div class="mesa"><span>Procesado</span><b id="procesado" style="color:var(--naranja)">—</b></div><div class="mesa"><span>Total votos</span><b id="total">—</b></div></div>
     <footer class="footer">Designed &amp; Developed by
       <a href="https://wa.me/5491164148500?text=Hola%2C%20te%20consulto%20desde%20la%20web%20TREP" target="_blank" rel="noopener" aria-label="Contactar a Axial Security por WhatsApp">
-        <span style="display:inline-flex;align-items:center;gap:4px"><svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25D366" d="M12.04 2a9.84 9.84 0 0 0-8.42 14.94L2 22l5.2-1.58A9.99 9.99 0 1 0 12.04 2Zm0 17.99a8.04 8.04 0 0 1-4.1-1.12l-.29-.17-3.08.94.95-3-.19-.31A7.93 7.93 0 1 1 12.04 20Zm4.39-5.94c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>Axial Security</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;line-height:1"><svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true"><path fill="#25D366" d="M12.04 2a9.84 9.84 0 0 0-8.42 14.94L2 22l5.2-1.58A9.99 9.99 0 1 0 12.04 2Zm0 17.99a8.04 8.04 0 0 1-4.1-1.12l-.29-.17-3.08.94.95-3-.19-.31A7.93 7.93 0 1 1 12.04 20Zm4.39-5.94c-.24-.12-1.43-.7-1.65-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.01-.37.11-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.69 2.58 4.1 3.62.57.25 1.02.39 1.37.5.58.18 1.1.16 1.51.1.46-.07 1.43-.58 1.63-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28Z"/></svg>Axial Security</span>
       </a>
     </footer>
   </main>
@@ -126,7 +124,8 @@ $("t1").onclick=e=>{e.stopPropagation();page=1;renderRows()};$("t2").onclick=e=>
 function estadoUI(data){
  const e=$("estado");e.className="live";
  if(data.ok && !data.stale){e.textContent="● En Vivo"}
- else if(data.stale){e.textContent="● Último dato";e.classList.add("stale")}
+ else if(data.stale && data.ultimaRecepcion){e.textContent="⚠ PUENTE CAÍDO";e.classList.add("bridge")}
+ else if(data.stale){e.textContent="● Esperando colector";e.classList.add("stale")}
  else{e.textContent="● Sin conexión";e.classList.add("error")}
  $("hora").textContent=hhmmss(data.corteOficial||data.ultimaRecepcion||data.servidorHora);
  $("consulta").textContent=hhmmss(data.ultimaConsulta);
@@ -157,6 +156,12 @@ async function actualizar(forzar=false){
 $("refresh").onclick=e=>{e.stopPropagation();actualizar(true)};
 setInterval(()=>{timer--;$("countdown").textContent=Math.max(timer,0)+"s";if(timer<=0)actualizar(false)},1000);
 actualizar(false);
+try{
+  if(!sessionStorage.getItem("trep_visita_registrada")){
+    sessionStorage.setItem("trep_visita_registrada","1");
+    fetch("/api/visita",{method:"POST",cache:"no-store"}).catch(()=>{});
+  }
+}catch(_){}
 </script>
 </body>
 </html>

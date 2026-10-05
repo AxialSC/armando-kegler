@@ -4,7 +4,7 @@ const path = require("path");
 
 const app = express();
 
-const VERSION = "2.12.0";
+const VERSION = "2.12.1";
 const LIVE_MS = 120_000; // LIVE mientras el último envío tenga menos de 2 minutos
 const COLLECTOR_TOKEN = process.env.COLLECTOR_TOKEN || "";
 
@@ -171,6 +171,10 @@ let estadoActual = {
 
 let firmaUltimosDatos = null;
 let ultimaRecepcionMs = null;
+
+// Contador local de respaldo para el panel. GoatCounter sigue siendo la fuente principal.
+// Este contador se reinicia si Render reinicia el proceso.
+let visitasLocales = 0;
 
 function parsearCarga(body) {
   const intData = body?.intendente;
@@ -366,6 +370,57 @@ app.post("/api/colector", (req, res) => {
       error: err.message
     });
   }
+});
+
+
+app.post("/api/visita", (req, res) => {
+  visitasLocales += 1;
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, visitasLocales });
+});
+
+app.get("/api/visitas", async (req, res) => {
+  res.set("Cache-Control", "no-store");
+  const urls = [
+    "https://armando-kegler.goatcounter.com/counter/%2F.json",
+    "https://armando-kegler.goatcounter.com/counter//.json"
+  ];
+
+  for (const url of urls) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    try {
+      const r = await fetch(url + "?t=" + Date.now(), {
+        signal: controller.signal,
+        cache: "no-store",
+        headers: { "Accept": "application/json,text/plain,*/*" }
+      });
+      if (r.ok) {
+        const j = await r.json();
+        const count = Number(j?.count);
+        if (Number.isFinite(count)) {
+          clearTimeout(timeout);
+          return res.json({
+            ok: true,
+            count,
+            source: "GOATCOUNTER",
+            localFallback: visitasLocales
+          });
+        }
+      }
+    } catch (_) {
+      // probar siguiente URL / fallback local
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  res.json({
+    ok: true,
+    count: visitasLocales,
+    source: "LOCAL_RENDER",
+    note: "Respaldo local: se reinicia si Render reinicia el proceso"
+  });
 });
 
 app.get("/api/resultados", (req, res) => {
