@@ -4,21 +4,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#071226">
-  <title>TREP en Vivo - Armando Kegler · 2.12.8</title>
-  <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js">
-const SHARE_URL="https://armando-kegler.onrender.com/";
-const SHARE_TEXT="Resultados TREP · Armando Kegler · Tomás Romero Pereira";
-function shareX(){window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(SHARE_TEXT)+"&url="+encodeURIComponent(SHARE_URL),"_blank","noopener");}
-function shareFacebook(){window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(SHARE_URL),"_blank","noopener");}
-async function shareGeneric(red){
-  if(navigator.share){
-    try{await navigator.share({title:SHARE_TEXT,text:SHARE_TEXT,url:SHARE_URL});return;}catch(_){}
+  <title>TREP en Vivo - Armando Kegler · 2.12.10</title>
+    <script data-goatcounter="https://armando-kegler.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+  <script>
+  const AXIAL_SHARE_URL="https://armando-kegler.onrender.com/";
+  const AXIAL_SHARE_TEXT="Resultados TREP · Armando Kegler · Tomás Romero Pereira";
+  const AXIAL_SHARE_TITLE="Resultados TREP en Vivo: Armando Kegler (Opción 4)";
+  function isMobileDevice(){return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"");}
+  async function shareTo(platform){
+    const payload={title:AXIAL_SHARE_TITLE,text:AXIAL_SHARE_TEXT,url:AXIAL_SHARE_URL};
+    if(navigator.share && isMobileDevice()){
+      try{await navigator.share(payload);return;}catch(e){if(e&&e.name==="AbortError")return;}
+    }
+    if(platform==="X"){
+      window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(AXIAL_SHARE_TEXT)+"&url="+encodeURIComponent(AXIAL_SHARE_URL),"_blank","noopener,noreferrer");
+      return;
+    }
+    if(platform==="Facebook"){
+      window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(AXIAL_SHARE_URL),"_blank","noopener,noreferrer");
+      return;
+    }
+    try{await navigator.clipboard.writeText(AXIAL_SHARE_URL);alert("Enlace copiado. Abrí "+platform+" y pegalo para compartir.");}
+    catch(e){prompt("Copiá este enlace para compartir en "+platform+":",AXIAL_SHARE_URL);}
   }
-  try{await navigator.clipboard.writeText(SHARE_URL);alert("Enlace copiado para compartir en "+red);}
-  catch(_){prompt("Copiá este enlace para compartir en "+red,SHARE_URL);}
-}
-
-</script>
+  </script>
   <meta property="og:type" content="website">
   <meta property="og:title" content="Resultados TREP en Vivo: Armando Kegler (Opción 4)">
   <meta property="og:description" content="Monitor TREP - Tomás Romero Pereira">
@@ -41,13 +50,13 @@ async function shareGeneric(red){
     .diag b{color:var(--oscuro)}.diag .wide{grid-column:1/-1}.version{position:absolute;right:12px;bottom:9px;float:none;opacity:.82;font-size:.62rem;font-weight:800}
     .flip-box{perspective:1000px;width:100%;cursor:pointer}.flip-inner{position:relative;width:100%;height:100%;transition:transform .65s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}.girado .flip-inner{transform:rotateY(180deg)}
     .front,.back{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;box-shadow:0 3px 9px #00000012}.back{transform:rotateY(180deg)}
-    #top{height:300px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:6px 9px;display:flex;flex-direction:column;justify-content:space-between;text-align:center}
-    .hint{align-self:center;font-size:.69rem;border:0;cursor:pointer;font-weight:900;padding:5px 13px;border-radius:20px;border:2px solid var(--naranja);background:#ea580c;color:#fff;box-shadow:0 0 11px #ea580c88}
-    .candidate{display:flex;justify-content:center;align-items:center;gap:10px}.photo{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid var(--naranja)}
-    .info{text-align:left}.pills{display:flex;gap:4px}.pill{font-size:.61rem;font-weight:900;padding:2px 6px;border-radius:6px;text-transform:uppercase}.l9{background:#e8f5e9;color:var(--verde2);border:1px solid var(--verde)}.op{background:var(--naranja);color:#fff}
-    .cargo{font-size:.62rem;font-weight:800;color:var(--naranja)}.name{font-size:.90rem;font-weight:900;color:var(--verde2)}
-    .votes{background:linear-gradient(#fafcfa,#e8f5e9);border:1px dashed var(--verde);border-radius:10px;padding:6px}.votes strong{display:block;font-size:1.92rem;color:var(--verde);line-height:1}.votes span{font-size:.59rem;color:var(--gris);font-weight:800;text-transform:uppercase}
-    .subtotal{font-size:.66rem;color:var(--gris)}
+    #top{height:308px}.front-k{background:#fff;border:1.5px solid var(--verde);padding:8px 10px 10px;display:flex;flex-direction:column;justify-content:flex-start;gap:10px;text-align:center}
+    .hint{align-self:center;font-size:.69rem;border:0;cursor:pointer;font-weight:900;padding:5px 14px;border-radius:20px;border:2px solid var(--naranja);background:#ea580c;color:#fff;box-shadow:0 0 11px #ea580c88}
+    .candidate{display:flex;justify-content:center;align-items:center;gap:14px;padding:0 6px}.photo{width:58px;height:58px;border-radius:50%;object-fit:cover;border:2.5px solid var(--naranja);box-shadow:0 2px 8px #f36c2133}
+    .info{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left}.pills{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.pill{font-size:.61rem;font-weight:900;padding:2px 7px;border-radius:7px;text-transform:uppercase}.l9{background:#e8f5e9;color:var(--verde2);border:1px solid var(--verde)}.op{background:var(--naranja);color:#fff}
+    .cargo-bubble{display:inline-flex;align-items:center;align-self:flex-start;font-size:.60rem;font-weight:900;color:var(--naranja);background:#fff7ed;border:1px solid #fdba74;border-radius:999px;padding:3px 8px;letter-spacing:.2px;text-transform:uppercase}.name{font-size:1.02rem;font-weight:900;color:var(--verde2);line-height:1.05;letter-spacing:.2px}
+    .votes{background:linear-gradient(#fafcfa,#e8f5e9);border:1px dashed var(--verde);border-radius:10px;padding:7px 6px}.votes strong{display:block;font-size:1.92rem;color:var(--verde);line-height:1}.votes span{font-size:.59rem;color:var(--gris);font-weight:800;text-transform:uppercase}
+    .subtotal{margin-top:auto;font-size:.66rem;color:var(--gris)}
     .back-k{background:#fff;border:1.5px solid var(--verde2);padding:7px 8px;display:flex;flex-direction:column;height:100%}.back-head{display:flex;justify-content:space-between;align-items:center;gap:6px;min-height:26px}.back-head h2{font-size:.80rem;color:var(--verde2);line-height:1.05}.autobadge{font-size:.58rem;background:#e0f2fe;color:#0369a1;padding:3px 6px;border-radius:10px;white-space:nowrap}
     .tabs{display:flex;gap:5px;margin:6px 0}.tab{flex:1;border:1px solid var(--verde);background:#fff;color:var(--verde2);padding:6px 4px;border-radius:7px;font-size:.66rem;font-weight:900}.tab.activa{background:var(--verde);color:#fff}.rows{flex:1;display:flex;flex-direction:column;gap:5px;min-height:0;height:100%}.row{display:flex;align-items:center;padding:5px 7px;border-radius:7px;background:#f8fafc;border-left:4px solid #ccc;font-size:.70rem;min-height:0;flex:1}.row.r{border-left-color:var(--rojo)}.row.g{border-left-color:var(--verde)}.row.y{border-left-color:var(--amarillo)}.row.b{border-left-color:var(--azul)}.row.k{border:1.5px solid var(--verde);border-left:5px solid var(--naranja);background:#ecfdf5;font-weight:900}.pos{min-width:27px;font-weight:900;font-size:.75rem}.rn{flex:1;white-space:normal;overflow:hidden;line-height:1.05;font-weight:700}.rn small{font-size:.58rem;color:#55636b}.rv{font-weight:900;font-size:.76rem;margin-left:6px}
     #bottom{height:154px}.front-i{background:#fff;border:1px solid #e1e7e3;padding:7px 10px;display:flex;flex-direction:column;justify-content:space-between}.section{display:flex;justify-content:space-between;text-transform:uppercase;font-size:.72rem;font-weight:900;color:var(--gris)}
@@ -55,20 +64,20 @@ async function shareGeneric(red){
     .back-b{background:#fff;border:1px solid #dce4df;padding:9px 10px;text-align:left}.seats-title{font-size:.68rem;margin-bottom:7px}.seats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}.seat{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:7px 3px}.seat span{display:block;font-size:.57rem;color:var(--gris);font-weight:800;line-height:1.05}.seat strong{font-size:1.1rem}
     .mesas{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border:1px solid #dce4df;border-radius:11px;padding:8px 6px;text-align:center;margin-top:auto}.mesa span{display:block;font-size:.64rem;color:var(--gris);text-transform:uppercase}.mesa b{font-size:1rem;color:var(--verde2)}
     .footer{text-align:center;font-size:.64rem;color:#718096;margin-top:0;display:flex;justify-content:center;align-items:center;gap:4px;min-height:20px;line-height:1}.footer a{color:#4a5568;text-decoration:none;font-weight:800;display:inline-flex;align-items:center}.footer svg{display:block;vertical-align:middle}
-    @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{height:300px;min-height:300px;flex:none}}
+    @media(max-width:460px){body{padding:0}.phone{width:100vw;min-height:100dvh;border-width:9px 8px;border-radius:38px}.container{min-height:calc(100dvh - 18px)}#top{height:308px;min-height:308px;flex:none}}
     @media(max-height:780px){#top{min-height:272px}.diag{display:none}.phone{border-radius:32px}.container{gap:5px}}
   
-.social-share{width:min(270px,82%);margin:8px auto 5px;display:flex;justify-content:space-between;align-items:center;gap:18px}
-.social-share button{width:34px;height:34px;border:0;background:transparent;padding:1px;display:grid;place-items:center;cursor:pointer;border-radius:50%}
-.social-share button:active{transform:scale(.94)}
-.social-share svg{width:26px;height:26px;display:block}.social-share img{width:29px;height:29px;object-fit:contain;display:block}
-@media(max-width:460px){.social-share{width:min(260px,80%);gap:16px;margin-top:7px}.social-share button{width:33px;height:33px}.social-share img{width:28px;height:28px}}
+.social-share{width:min(292px,86%);margin:2px auto 3px;display:flex;justify-content:center;align-items:center;gap:26px}
+.social-share button{width:42px;height:42px;border:0;background:transparent;padding:2px;display:grid;place-items:center;cursor:pointer;border-radius:50%;transition:transform .15s ease}
+.social-share button:active{transform:scale(.93)}
+.social-share img{width:34px;height:34px;object-fit:contain;display:block}
+@media(max-width:460px){.social-share{width:min(286px,88%);gap:24px;margin-top:1px}.social-share button{width:40px;height:40px}.social-share img{width:33px;height:33px}}
 </style>
 </head>
 <body>
 <div class="phone">
   <main class="container">
-    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v. 2.12.8</span></p></header>
+    <header class="header"><h1>Tomás Romero Pereira</h1><p>Elecciones Municipales · Monitor TREP <span class="version">v. 2.12.10</span></p></header>
 
     <div class="timer">
       <span><span id="estado" class="live">● Conectando</span> | Corte: <b id="hora">--:--:--</b></span>
@@ -87,15 +96,15 @@ async function shareGeneric(red){
           <button id="openConcejales" class="hint" type="button">👉 TOCÁ AQUÍ: 12 CONCEJALES ELECTOS ↻</button>
           <div class="candidate">
             <img class="photo" src="kegler.jpg" alt="Armando Kegler">
-            <div class="info"><div class="pills"><span class="pill l9">Lista 9</span><span class="pill op">Opción 4</span></div><div class="cargo">CONCEJAL MUNICIPAL</div><div class="name">ARMANDO KEGLER</div></div>
+            <div class="info"><div class="pills"><span class="pill l9">Lista 9</span><span class="pill op">Opción 4</span></div><div class="cargo-bubble">Concejal municipal</div><div class="name">ARMANDO KEGLER</div></div>
           </div>
           
 
 <div class="social-share" aria-label="Compartir">
-  <button type="button" title="Instagram" aria-label="Compartir en Instagram" onclick="event.stopPropagation();shareGeneric('Instagram')"><img src="instagram.png" alt="Instagram"></button>
-  <button type="button" title="TikTok" aria-label="Compartir en TikTok" onclick="event.stopPropagation();shareGeneric('TikTok')"><img src="tiktok.png" alt="TikTok"></button>
-  <button type="button" title="X" aria-label="Compartir en X" onclick="event.stopPropagation();shareX()"><img src="x.png" alt="X"></button>
-  <button type="button" title="Facebook" aria-label="Compartir en Facebook" onclick="event.stopPropagation();shareFacebook()"><img src="facebook.png" alt="Facebook"></button>
+  <button type="button" title="Instagram" aria-label="Compartir en Instagram" onclick="event.stopPropagation();shareTo('Instagram')"><img src="instagram.png" alt="Instagram"></button>
+  <button type="button" title="TikTok" aria-label="Compartir en TikTok" onclick="event.stopPropagation();shareTo('TikTok')"><img src="tiktok.png" alt="TikTok"></button>
+  <button type="button" title="X" aria-label="Compartir en X" onclick="event.stopPropagation();shareTo('X')"><img src="x.png" alt="X"></button>
+  <button type="button" title="Facebook" aria-label="Compartir en Facebook" onclick="event.stopPropagation();shareTo('Facebook')"><img src="facebook.png" alt="Facebook"></button>
 </div>
 <div class="votes"><strong id="kegler">—</strong><span>Votos preferenciales obtenidos</span></div>
           <div class="subtotal">Total Lista 9 (Concejales): <b id="lista9">—</b> votos</div>
@@ -203,21 +212,6 @@ try{
 }catch(_){}
 </script>
 
-<script>
-const AXIAL_SHARE_URL="https://armando-kegler.onrender.com/";
-const AXIAL_SHARE_TEXT="Resultados TREP · Armando Kegler · Tomás Romero Pereira";
-function shareFacebook(){window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(AXIAL_SHARE_URL),"_blank","noopener,noreferrer");}
-function shareX(){window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(AXIAL_SHARE_TEXT)+"&url="+encodeURIComponent(AXIAL_SHARE_URL),"_blank","noopener,noreferrer");}
-async function shareGeneric(red){
-  if(navigator.share){
-    try{await navigator.share({title:AXIAL_SHARE_TEXT,text:AXIAL_SHARE_TEXT,url:AXIAL_SHARE_URL});return;}
-    catch(e){if(e&&e.name==="AbortError")return;}
-  }
-  try{await navigator.clipboard.writeText(AXIAL_SHARE_URL);alert("Enlace copiado. Abrí "+red+" y pegalo para compartir.");}
-  catch(e){prompt("Copiá este enlace para compartir en "+red+":",AXIAL_SHARE_URL);}
-}
-document.querySelectorAll(".social-share button").forEach(btn=>btn.addEventListener("click",e=>e.stopPropagation()));
-</script>
 
 </body>
 </html>
